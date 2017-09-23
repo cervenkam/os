@@ -1,4 +1,4 @@
-%.bin: %.asm
+%.bin: main.asm  hello.asm gdt.asm print.asm protected.asm
 	nasm -f bin $< -o $@
-run: hello.bin
-	qemu-system-x86_64 -hda hello.bin
+main: main.bin
+	qemu-system-x86_64 -hda main.bin
