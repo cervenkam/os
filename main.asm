@@ -20,6 +20,8 @@ chraneny:
 zprava_boot:
 	db "Nacteno!", 0
 zprava_chraneny:
-	db "Prepnuto do chraneneho modu!", 0
+	db "Prepnuto do chraneneho modu!", 0xa, "Vsechno OK", 0
+druha_radka:
+	db "Dalsi radka!", 0
 times 510-($-$$) db 0
 dw 0xaa55
