@@ -1,27 +1,27 @@
 org 0x7c00
-	mov bp, 0x9000
-	mov sp, bp
-	mov eax, zprava_boot
-	call pis16
-	call prepnuti_chraneny
-	jmp $
+	mov bp, 0x9000           ; nastaveni bazove adresy zasobniku
+	mov sp, bp               ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
+	mov eax, zprava_boot     ; vyber zpravy k vypisu
+	call pis16               ; vypis zpravy v realnem modu
+	call prepnuti_chraneny   ; prepnuti procesoru do chraneneho rezimu (dojde ke skoku na navesti "chraneny")
+	jmp $                    ; nekonecna smycka (skok na sebe sama)
 
-%include "gdt.asm"
-%include "protected.asm"
-%include "print.asm"
+%include "gdt.asm"               ; vlozeni definice global descriptor table
+%include "protected.asm"         ; vlozeni kodu pro prechod do chraneneho (protected) modu procesoru
+%include "print.asm"             ; vlozeni funkci pro vypis v realnem a chranenem modu
 
-bits 32
+bits 32                          ; zacatek kodu v chranenem 32bitovem rezimu
 chraneny:
-	mov eax, zprava_chraneny
-	xor ebx, ebx
-	mov ch, 0x0f
-	call pis32
-	jmp $
+	mov eax, zprava_chraneny ; vyber zpravy k vypisu
+	xor ebx, ebx             ; vynulovani EBX - zprava bude psana na zacatek obrazovky
+	mov ch, 0x0f             ; vyber fontu
+	call pis32               ; vypsani zpravy v chranenem modu
+	jmp $                    ; nekonecna smycka (skok na sebe sama)
 zprava_boot:
 	db "Nacteno!", 0
 zprava_chraneny:
 	db "Prepnuto do chraneneho modu!", 0xa, "Vsechno OK", 0
 druha_radka:
 	db "Dalsi radka!", 0
-times 510-($-$$) db 0
-dw 0xaa55
+times 510-($-$$) db 0           ; doplneni pameti do 510ti bajtu
+dw 0xaa55                       ; vlozeni bajtu 0xAA a 0x55 -> jedna se o bootovatelny sektor
