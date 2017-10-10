@@ -1,11 +1,15 @@
 org 0x7c00
+bits 16
 	mov bp, 0x9000           ; nastaveni bazove adresy zasobniku
 	mov sp, bp               ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 	mov eax, zprava_boot     ; vyber zpravy k vypisu
 	call pis16               ; vypis zpravy v realnem modu
+	call obrazek_zobrazit    ; zobrazeni uvodniho obrazku
+	jmp $
 	call prepnuti_chraneny   ; prepnuti procesoru do chraneneho rezimu (dojde ke skoku na navesti "chraneny")
 	jmp $                    ; nekonecna smycka (skok na sebe sama)
 
+%include "splash.asm"            ; vlozeni nacitaci obrazovky
 %include "gdt.asm"               ; vlozeni definice global descriptor table
 %include "protected.asm"         ; vlozeni kodu pro prechod do chraneneho (protected) modu procesoru
 %include "print.asm"             ; vlozeni funkci pro vypis v realnem a chranenem modu
