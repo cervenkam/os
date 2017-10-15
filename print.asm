@@ -1,3 +1,4 @@
+bits 32
 ; pomocne funkce pro vypis textu na obrazovku
 ; dostupne funkce: pis32, pis16,
 
@@ -77,7 +78,7 @@ pis32_posun_konec:
 	popa             ; obnova vsech registru ze zasobniku
 	mov ebx, 0xf00   ; nastaveni pozice vypisu (EBX) na zacatek posledni radky
 	ret              ; ukonceni podprogramu posuvu
-
+bits 16
 ; funkce pis16, pise zpravu v realnem 16bitovem rezimu
 ; => AL - adresa zpravy
 pis16:
@@ -94,3 +95,26 @@ pis16_konec:
 	popa  ; obnova vsech registru
 	ret   ; ukonceni podprogramu vypisu v 16tibitovem rezimu
 
+; funkce pis16_registr - vypisuje obsah registru
+; => AL - obsah registru
+pis16_registr:
+	pusha                                 ; ulozeni vsech registru do zasobniku
+	mov si, ax                            ; nastaveni registru SI na hodnotu znaku ulozenou v AX
+	mov ah, 0x0e                          ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
+	mov bl, al                            ; zaloha registru AL do BL
+	shr al, 4                             ; deleni 16ti
+	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
+	int 0x10                              ; volani video sluby BIOSu
+	mov al, bl                            ; obnova registru AL z BL
+	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
+	int 0x10                              ; volani video sluby BIOSu
+pis16_registr_konec:
+	popa                                  ; obnova vsech registru
+	ret                                   ; ukonceni podprogramu vypisu v 16tibitovem rezimu
+pis16_registr_preved_znak:
+	add al,0x30                           ; posun do oblasi ASCII cislic
+	cmp al,0x3A                           ; pokud znak je cislice
+	jl pis16_registr_preved_znak_konec   ; neni treba provadet upravy
+	add al,8                              ; posun do oblasti ASCII znaku
+pis16_registr_preved_znak_konec:
+	ret

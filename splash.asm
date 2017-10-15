@@ -1,5 +1,6 @@
-%define OBRAZEK_SIRKA 8
-%define OBRAZEK_VYSKA 8
+bits 16
+%define OBRAZEK_SIRKA 52
+%define OBRAZEK_VYSKA 67
 obrazek_zobrazit:
 	pusha
 	mov ah, 0x0f    ; zjisteni video modu
@@ -27,13 +28,5 @@ obrazek_konec_smycky:
 	;int 0x10        ; nastaveni tohoto modu (TODO smaze se obrazek)
 	popa
 	ret
-obrazek:
-	db  8,10,10, 8,10, 8,10,10 ; TODO creeper face
-	db 10, 3,10,10,10,10, 8,10
-	db 10, 0, 0,10, 2, 0, 0,10
-	db 10, 0, 0,10,10, 0, 0, 2
-	db  2,10,10, 0, 0,10,10,10
-	db 10,10, 0, 0, 0, 0,3,10
-	db  8,10, 0, 0, 0, 0,10,10
-	db 10,10, 0,10,10, 0,10,10
+%include "picture.asm"
 	

@@ -1,3 +1,4 @@
+bits 32
 ; GDT = Global Descriptor Table
 ; definice rozdeleni pameti na kodovy a datovy segment
 ; zdroj: https://en.wikipedia.org/wiki/Global_Descriptor_Table
