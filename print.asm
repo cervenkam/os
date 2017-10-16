@@ -106,6 +106,7 @@ pis16_registr:
 	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
 	int 0x10                              ; volani video sluby BIOSu
 	mov al, bl                            ; obnova registru AL z BL
+	and al,0xf
 	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
 	int 0x10                              ; volani video sluby BIOSu
 pis16_registr_konec:
@@ -115,6 +116,6 @@ pis16_registr_preved_znak:
 	add al,0x30                           ; posun do oblasi ASCII cislic
 	cmp al,0x3A                           ; pokud znak je cislice
 	jl pis16_registr_preved_znak_konec   ; neni treba provadet upravy
-	add al,8                              ; posun do oblasti ASCII znaku
+	add al,7                              ; posun do oblasti ASCII znaku
 pis16_registr_preved_znak_konec:
 	ret

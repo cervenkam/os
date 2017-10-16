@@ -1,6 +1,6 @@
 bits 16
-%define OBRAZEK_SIRKA 52
-%define OBRAZEK_VYSKA 67
+%define OBRAZEK_SIRKA 64
+%define OBRAZEK_VYSKA 64
 obrazek_zobrazit:
 	pusha
 	mov ah, 0x0f    ; zjisteni video modu
@@ -24,8 +24,13 @@ obrazek_smycka:
 	dec bx                 ; snizeni poctu zbyvajicich radek
 	jmp obrazek_smycka     ; opakovani vypisu radky
 obrazek_konec_smycky:
+	push cx         ; ulozeni registru CX na zasobnik
+	mov cx,0x10     ; spat cca 1s (1048576us)
+	mov ah,0x86     ; parametr pro spani
+	int 0x15        ; volani sluzeb BIOSu
+	pop cx          ; obnova registru CX ze zasobniku
 	pop ax          ; obnova video modu ze zasobniku
-	;int 0x10        ; nastaveni tohoto modu (TODO smaze se obrazek)
+	int 0x10        ; nastaveni tohoto modu (TODO smaze se obrazek)
 	popa
 	ret
 %include "picture.asm"

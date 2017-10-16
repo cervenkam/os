@@ -32,7 +32,13 @@ dw 0xaa55                         ; vlozeni bajtu 0xAA a 0x55 -> jedna se o boot
 
 dalsi_sektory:
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
-	jmp $
+cyklus:
+	xor ah,ah
+	int 0x16
+	mov ah,0xe
+	int 0x10                  ; volani video sluby BIOSu
+	;call pis16_registr
+	jmp cyklus
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "gdt.asm"                ; vlozeni definice global descriptor table
