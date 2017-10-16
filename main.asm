@@ -30,21 +30,37 @@ zprava_restart:
 times 510-($-$$) db 0             ; doplneni pameti do 510ti bajtu
 dw 0xaa55                         ; vlozeni bajtu 0xAA a 0x55 -> jedna se o bootovatelny sektor
 
+test_zapis:
+	mov ax,0x0313
+	mov bx,test_zapis
+	mov cx,0x0003
+	mov dx,0x0081
+	int 0x13
+	call pis16_registr
+	jmp $
 dalsi_sektory:
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
 cyklus:
 	xor ah,ah
 	int 0x16
 	mov ah,0xe
+	call tabulka_znaku
 	int 0x10                  ; volani video sluby BIOSu
-	;call pis16_registr
+	call pis16_registr
 	jmp cyklus
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "gdt.asm"                ; vlozeni definice global descriptor table
 %include "print.asm"              ; vlozeni funkci pro vypis v realnem a chranenem modu
+%include "characters.asm"
 
 druha_radka:
 	db "Dalsi radka!", 0
 zprava_boot:
 	db "Nacteno!", 0
+fat_prostor:
+	times 2000 db 0
+editor_prostor:
+	times 1000 db 0
+prohlizec_prostor:
+	times 1000 db 0

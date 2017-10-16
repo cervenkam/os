@@ -9,7 +9,7 @@ obrazek_zobrazit:
 	push ax         ; ulozeni video modu na zasobnik
 	mov ax, 0x13    ; nastaveni video modu 320x200, 256barev
 	int 0x10        ; nastaveni video modu
-	mov ax, 0xa000
+	mov ax, 0xa558
 	mov es, ax
 	mov bx, OBRAZEK_VYSKA
 	mov di, 0         ; ukladani do video pameti
