@@ -31,10 +31,11 @@ times 510-($-$$) db 0             ; doplneni pameti do 510ti bajtu
 dw 0xaa55                         ; vlozeni bajtu 0xAA a 0x55 -> jedna se o bootovatelny sektor
 
 test_zapis:
+	mov ax,0x0001
+	call lba2chs_prevod
 	mov ax,0x0313
 	mov bx,test_zapis
-	mov cx,0x0003
-	mov dx,0x0081
+	mov dl,0x81
 	int 0x13
 	call pis16_registr
 	jmp $
@@ -52,8 +53,9 @@ cyklus:
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "gdt.asm"                ; vlozeni definice global descriptor table
 %include "print.asm"              ; vlozeni funkci pro vypis v realnem a chranenem modu
-%include "characters.asm"
-
+%include "characters.asm"         ; vlozeni funkci pro praci se znaky
+%include "lba2chs.asm"            ; vlozeni funkce pro prevod linearni adresu na adresu cylindr,hlava,sektor
+          
 druha_radka:
 	db "Dalsi radka!", 0
 zprava_boot:
