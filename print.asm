@@ -119,3 +119,28 @@ pis16_registr_preved_znak:
 	add al,7                              ; posun do oblasti ASCII znaku
 pis16_registr_preved_znak_konec:
 	ret
+
+%define pocet_registru 8
+; funkce pis16_registry - vypis obsahu vsech registru
+; zadne parametry ani vystupy
+pis16_registry:
+	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku 
+	mov bx, pocet_registru
+	mov ax, pis16_registry_zprava
+	call pis16
+	mov cx, pis16_registry_texty
+pis16_registry_smycka:
+	mov ax,cx
+	call pis16
+	add cx,7
+	pop ax;
+	ror ax,8
+	call pis16_registr
+	rol ax,8
+	call pis16_registr	
+	dec bl	
+	jne pis16_registry_smycka
+	ret
+pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: ",0
+pis16_registry_zprava:
+	db "Vypis registru:", 0
