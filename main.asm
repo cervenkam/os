@@ -47,6 +47,9 @@ test_zapis:
 	mov dx, 0xEF01
 
 	call pis16_registry
+	call pis16_registry	
+
+
 	jmp $
 
 cyklus:
