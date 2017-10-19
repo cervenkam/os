@@ -30,17 +30,24 @@ zprava_restart:
 times 510-($-$$) db 0             ; doplneni pameti do 510ti bajtu
 dw 0xaa55                         ; vlozeni bajtu 0xAA a 0x55 -> jedna se o bootovatelny sektor
 
-test_zapis:
-	mov ax,0x0001
-	call lba2chs_prevod
-	mov ax,0x0313
-	mov bx,test_zapis
-	mov dl,0x81
-	int 0x13
-	call pis16_registr
-	jmp $
 dalsi_sektory:
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
+test_zapis:
+	;mov dx,0x0081 ;id disku
+	;mov ax,0x1300 
+	;int 0x13
+	;jc cyklus
+
+	;call pis16_registr
+
+	mov di, 0x1234
+	mov ax, 0x1122
+	mov bx, 0x5678
+	mov cx, 0x9ABC
+
+	call print_registers
+	jmp $
+
 cyklus:
 	xor ah,ah
 	int 0x16
@@ -55,6 +62,7 @@ cyklus:
 %include "print.asm"              ; vlozeni funkci pro vypis v realnem a chranenem modu
 %include "characters.asm"         ; vlozeni funkci pro praci se znaky
 %include "lba2chs.asm"            ; vlozeni funkce pro prevod linearni adresu na adresu cylindr,hlava,sektor
+%include "registers.asm"	  ; tvoje máma
           
 druha_radka:
 	db "Dalsi radka!", 0
