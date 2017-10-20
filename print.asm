@@ -44,6 +44,8 @@ pis16_registr_preved_znak_konec:
 ; funkce pis16_registry - vypis obsahu vsech registru
 ; zadne parametry ani vystupy
 pis16_registry:
+	push bx ;zachovani bx, je pouzivan pro cyklus
+	push cx ;zachovani cx, pouzito na adresu textu
 	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku 
 	mov bx, pocet_registru
 	mov ax, pis16_registry_zprava
@@ -52,7 +54,7 @@ pis16_registry:
 pis16_registry_smycka:
 	mov ax,cx
 	call pis16
-	add cx,7
+	add cx,7 ;zvyseni adresy na dalsi polozku
 	pop ax;
 	ror ax,8
 	call pis16_registr
@@ -62,6 +64,8 @@ pis16_registry_smycka:
 	jne pis16_registry_smycka
 	mov ax, pis16_registry_odradkovani
 	call pis16
+	pop cx
+	pop bx
 	ret
 pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: ",0
 pis16_registry_zprava:
