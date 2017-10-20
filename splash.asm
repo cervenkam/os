@@ -4,6 +4,7 @@ org 0
 %define OBRAZEK_VYSKA 64
 obrazek_zobrazit:
 	pusha
+	push es
 	mov ah, 0x0f    ; zjisteni video modu
 	int 0x10        ; zavolani sluzby BIOSu
 	xor ah, ah      ; smazani horniho bajtu AX
@@ -32,6 +33,7 @@ obrazek_konec_smycky:
 	pop cx          ; obnova registru CX ze zasobniku
 	pop ax          ; obnova video modu ze zasobniku
 	int 0x10        ; nastaveni tohoto modu (TODO smaze se obrazek)
+	pop es
 	popa
 	ret
 %include "picture.asm"

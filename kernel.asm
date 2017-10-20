@@ -9,22 +9,10 @@ start:
 	call pis16_registry
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
 test_zapis:
-	;mov dx,0x0081 ;id disku
-	;mov ax,0x1300 
-	;int 0x13
-	;jc cyklus
-
-	;call pis16_registr
-
-	mov di, 0x1234
-	mov ax, 0x1122
-	mov bx, 0x5678
-	mov cx, 0x9ABC
-	mov dx, 0xEF01
-
+	mov bx, obrazek
+	mov cl, 1
+	call zapis_sektoru_na_disk
 	call pis16_registry
-	;jmp $
-
 cyklus:
 	xor ah,ah
 	int 0x16
@@ -35,6 +23,6 @@ cyklus:
 	jmp cyklus
 
 %include "characters.asm"         ; vlozeni funkci pro praci se znaky
-%include "lba2chs.asm"            ; vlozeni funkce pro prevod linearni adresu na adresu cylindr,hlava,sektor
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "print.asm"              ; vlozeni funkci pro vypis v realnem a chranenem modu
+%include "disk.asm"               ; vlozeni funkci pro praci s diskem
