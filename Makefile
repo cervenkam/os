@@ -1,4 +1,5 @@
 run: main.bin
+	find . -type f -name '*.bin' ! -name 'drive.bin' ! -name 'main.bin' -delete
 	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw
 main.bin: loader.bin kernel.bin filesystem.bin editor.bin browser.bin
 	cat $^ > $@
@@ -13,4 +14,4 @@ editor.bin: editor.asm
 browser.bin: browser.asm
 	nasm -f bin browser.asm -o $@
 clean:
-	rm main.bin kernel.bin loader.bin filesystem.bin editor.bin browser.bin
+	find . -type f -name '*.bin' ! -name 'drive.bin' -delete
