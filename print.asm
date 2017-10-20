@@ -44,12 +44,18 @@ pis16_registr_preved_znak_konec:
 ; funkce pis16_registry - vypis obsahu vsech registru
 ; zadne parametry ani vystupy
 pis16_registry:
-	push bx ;zachovani bx, je pouzivan pro cyklus
-	push cx ;zachovani cx, pouzito na adresu textu
-	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku 
+	pusha ; pro zachovani stavu registru
+	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku (pro postupny vypis)
+	jc nastav_carry ; zaznamenani CF, predchozi instrukce pusha jej nezměni
+	xor dx, dx 
+pokracuj: 	
 	mov bx, pocet_registru
 	mov ax, pis16_registry_zprava
 	call pis16
+	mov ax, pis16_carry_flag
+	call pis16
+        mov ax, dx
+	call pis16_registr 
 	mov cx, pis16_registry_texty
 pis16_registry_smycka:
 	mov ax,cx
@@ -64,11 +70,18 @@ pis16_registry_smycka:
 	jne pis16_registry_smycka
 	mov ax, pis16_registry_odradkovani
 	call pis16
-	pop cx
-	pop bx
+	popa
 	ret
-pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: ",0
+nastav_carry:
+	xor dx, dx
+	or dl, 0x01
+	jmp pokracuj
+
+pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: " ,0
 pis16_registry_zprava:
 	db "Vypis registru:", 0
+pis16_carry_flag
+	db 10, 13, "Carry Flag:", 0
 pis16_registry_odradkovani:
 	db 10, 13, 0
+

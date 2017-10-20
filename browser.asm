@@ -9,6 +9,12 @@ start:
 
 	mov ax, zprava
 	call pis16	
+	
+	;stc
+	call pis16_registry
+	stc ;nastavi CF  	
+	call pis16_registry
+
 	jmp $
 ;cyklus:
 	;xor ah,ah
