@@ -1,4 +1,5 @@
 bits 16
+org 0
 %define OBRAZEK_SIRKA 64
 %define OBRAZEK_VYSKA 64
 obrazek_zobrazit:

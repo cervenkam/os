@@ -1,6 +1,10 @@
-%.bin: $(wildcard *.asm)
-	nasm -f bin main.asm -o main.bin
-main: main.bin
-	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw
+run: main
+	qemu-system-x86_64 -drive file=main,format=raw -drive file=drive.bin,cache=none,format=raw
+main: kernel loader
+	cat loader kernel > main
+kernel: kernel.asm
+	nasm -f bin $< -o $@
+loader: loader.asm
+	nasm -f bin $< -o $@
 clean:
-	rm *.bin
+	rm main kernel loader
