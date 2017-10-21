@@ -80,7 +80,7 @@ nastav_carry:
 pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: " ,0
 pis16_registry_zprava:
 	db "Vypis registru:", 0
-pis16_carry_flag
+pis16_carry_flag:
 	db 10, 13, "Carry Flag:", 0
 pis16_registry_odradkovani:
 	db 10, 13, 0

@@ -11,10 +11,13 @@ start:
 	call pis16	
 	
 	;stc
-	call pis16_registry
-	stc ;nastavi CF  	
-	call pis16_registry
-
+	;call pis16_registry
+	;stc ;nastavi CF  	
+	;call pis16_registry
+	call text_nastavit_video_mod
+	mov ax,zprava
+	mov bx,0x70e0
+	call text_zobrazit
 	jmp $
 ;cyklus:
 	;xor ah,ah
@@ -30,6 +33,7 @@ konec:
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 %include "print.asm"
 %include "characters.asm"         ; vlozeni funkci pro praci se znaky
+%include "browser/text.asm"
 zprava:
-	db "Spusten pruvodce souboru",0
-times 0x200-($-$$) db 0
+	db "Spusteno",10,13,0
+times 0x1e00-($-$$) db 0

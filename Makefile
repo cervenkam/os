@@ -11,7 +11,7 @@ filesystem.bin: filesystem.asm
 	nasm -f bin filesystem.asm -o $@
 editor.bin: editor.asm
 	nasm -f bin editor.asm -o $@
-browser.bin: browser.asm
-	nasm -f bin browser.asm -o $@
+browser.bin: $(wildcard browser/*.asm)
+	nasm -f bin browser/browser.asm -o $@
 clean:
 	find . -type f -name '*.bin' ! -name 'drive.bin' -delete
