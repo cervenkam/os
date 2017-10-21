@@ -16,7 +16,7 @@ start:
 	;call pis16_registry
 	call text_nastavit_video_mod
 	mov ax,zprava
-	mov bx,0x70e0
+	mov bx,0x7108
 	call text_zobrazit
 	jmp $
 ;cyklus:

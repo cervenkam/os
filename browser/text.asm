@@ -1,7 +1,7 @@
 bits 16
 org 0
-%define VYSKA_ZNAKU 12
-%define SIRKA_OBRAZKU 16
+%define VYSKA_ZNAKU 6
+%define SIRKA_OBRAZKU 5
 %define SIRKA_OKNA 320
 %define TRANSPARENTNI 0x34
 ; nastavi video mod, bez parametru
@@ -53,7 +53,7 @@ text_zobraz_znak:
 	push ax
 	mov ax,VYSKA_ZNAKU
 	mul bx
-	mov bx,16
+	mov bx,SIRKA_OBRAZKU
 	mul bx
 	mov bx,ax
 	pop ax
@@ -103,12 +103,19 @@ znaky_pozice:
 	times 6 db 0
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku
 	times 5 db 0
+;znaky_sirka:
+;	times 48 db 0
+;	db 11,7,11,11,11,11,11,11,11,11                                                  ; sirka cislic
+;	times 7 db 0
+;	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+;	times 6 db 0
+;	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+;	times 5 db 0
 znaky_sirka:
 	times 48 db 0
-	db 11,7,11,11,11,11,11,11,11,11                                                  ; sirka cislic
+	db 5,5,5,5,5,5,5,5,5,5                                 ; sirka cislic
 	times 7 db 0
-	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 6 db 0
-	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 5 db 0
-
