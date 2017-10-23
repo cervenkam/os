@@ -1,9 +1,12 @@
 bits 16
 ; funkce pis16, pise zpravu v realnem 16bitovem rezimu
-; => AL - adresa zpravy
+; => DS:AX - adresa zpravy
 pis16:
 	pusha         ; ulozeni vsech registru do zasobniku
+	push ds
 	mov si, ax    ; nastaveni registru SI na hodnotu znaku ulozenou v AX
+	mov ax, cs
+	mov ds, ax
 	mov ah, 0x0e  ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
 pis16_smycka:
 	lodsb             ; nacteni znaku z adresy DS:SI do registru AL
@@ -12,6 +15,7 @@ pis16_smycka:
 	int 0x10          ; volani video sluby BIOSu
 	jmp pis16_smycka  ; opetovne volani, dokud neni konec retezce
 pis16_konec:
+	pop ds
 	popa  ; obnova vsech registru
 	ret   ; ukonceni podprogramu vypisu v 16tibitovem rezimu
 
@@ -40,11 +44,17 @@ pis16_registr_preved_znak:
 pis16_registr_preved_znak_konec:
 	ret
 
-%define pocet_registru 8
+%define pocet_registru 8+6 ; IP nejde ;/
 ; funkce pis16_registry - vypis obsahu vsech registru
 ; zadne parametry ani vystupy
 pis16_registry:
 	pusha ; pro zachovani stavu registru
+	push ss
+	push gs
+	push fs
+	push es
+	push ds
+	push cs
 	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku (pro postupny vypis)
 	jc nastav_carry ; zaznamenani CF, predchozi instrukce pusha jej nezměni
 	xor dx, dx 
@@ -77,7 +87,9 @@ nastav_carry:
 	or dl, 0x01
 	jmp pokracuj
 
-pis16_registry_texty: db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: " ,0
+pis16_registry_texty:
+	db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: ",0
+	db 10,13,"cs: ",0,10,13,"ds: ",0,10,13,"es: ",0,10,13,"fs: ",0,10,13,"gs: ",0,10,13,"ss: ",0
 pis16_registry_zprava:
 	db "Vypis registru:", 0
 pis16_carry_flag:

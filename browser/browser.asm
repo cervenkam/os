@@ -1,5 +1,6 @@
 org 0
 bits 16
+%include "consts.asm"
 start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
@@ -7,14 +8,14 @@ start:
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
-	mov ax, zprava
-	call pis16	
+	;mov ax, zprava
+	;call pis16	
 	
 	;stc
 	;call pis16_registry
 	;stc ;nastavi CF  	
 	;call pis16_registry
-	call text_nastavit_video_mod
+	;call text_nastavit_video_mod
 	mov ax,zprava
 	mov bx,0x7108
 	call text_zobrazit
@@ -33,7 +34,6 @@ konec:
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 %include "print.asm"
 %include "characters.asm"         ; vlozeni funkci pro praci se znaky
-%include "browser/text.asm"
 zprava:
 	db "Spusteno",10,13,0
-times 0x1e00-($-$$) db 0
+times 0x200-($-$$) db 0

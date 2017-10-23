@@ -11,9 +11,9 @@ text_nastavit_video_mod:
 	int 0x10        ; nastaveni video modu
 	pop ax
 	ret
-
+times 0x40-($-$$) db 0
 ; vykresli text na obrazovku ve video modu
-; AX => adresa retezce
+; DS:AX => adresa retezce
 ; BX => pozice retezce
 text_zobrazit:
 	pusha
@@ -26,10 +26,10 @@ text_zobrazit:
 	xor bx,bx       ; vynulovani registru BX
 	text_smycka:
 		lodsb                 ; nacteni znaku z adresy DS:SI do registru AL
-		cmp al, 0             ; porovnani na konec retezce
-		je text_konec         ; ukonceni v pripade konce retezce
+		test al,al
+		jz text_konec         ; ukonceni v pripade konce retezce
 		mov bl,al
-		mov ah,[znaky_sirka+bx] ; pridani pozice	
+		mov ah,[cs:znaky_sirka+bx] ; pridani pozice TODO
 		call text_zobraz_znak ; volani zobrazeni znaku
 		mov al,ah
 		xor ah,ah
@@ -47,10 +47,13 @@ text_zobrazit:
 ; DI => pozice znaku ve video pameti
 text_zobraz_znak:
 	pusha
+	push ds
+	push ax
+	mov ax,cs
+	mov ds,ax
 	xor bh,bh
 	mov bl,al
-	mov bl,[znaky_pozice+bx]
-	push ax
+	mov bl,[ds:znaky_pozice+bx]
 	mov ax,VYSKA_ZNAKU
 	mul bx
 	mov bx,SIRKA_OBRAZKU
@@ -58,7 +61,7 @@ text_zobraz_znak:
 	mov bx,ax
 	pop ax
 	mov si,bx
-	add si,ascii
+	add si,small
 	xor cx,cx
 	text_vnejsi_cyklus:
 		cmp cl,VYSKA_ZNAKU
@@ -69,12 +72,13 @@ text_zobraz_znak:
 			je text_konec_vnitrni_cyklus
 			push ax
 			lodsb
-			inc di
 			cmp al,TRANSPARENTNI ; transparentni barva
 			je text_pokracuj
-				dec si
-				dec di
-				movsb
+				mov byte [es:di],al
+				call pis16_registr
+				mov al, byte [es:di]
+				call pis16_registr
+				inc di
 			text_pokracuj:
 			pop ax
 			inc ch ; zvyseni cyklu
@@ -91,9 +95,11 @@ text_zobraz_znak:
 		pop ax
 		jmp text_vnejsi_cyklus
 	text_konec_vnejsi_cyklus:
+	pop ds
 	popa
 	ret
-%include "browser/ascii.asm"
+%include "images/small.asm"
+%include "print.asm"
 	
 znaky_pozice:
 	times 48 db 0
@@ -119,3 +125,4 @@ znaky_sirka:
 	times 6 db 0
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 5 db 0
+times 0x1e00-($-$$) db 0
