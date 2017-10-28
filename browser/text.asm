@@ -86,13 +86,12 @@ text_zobraz_znak:
 			je text_konec_vnitrni_cyklus
 			push ax
 			lodsb
-			inc di
 			cmp al,[bx+2] ; transparentni barva
 			je text_pokracuj
-				dec si
-				dec di
-				movsb
+				add al,[bx+9] ; pridani konstantni barvy
+				mov [es:di],al
 			text_pokracuj:
+			inc di
 			pop ax
 			inc ch ; zvyseni cyklu
 			jmp text_vnitrni_cyklus
@@ -149,6 +148,7 @@ pismo_male:
 	dw ascii_small ; adresa obrazku
 	dw ascii_small_pozice ; pozice pismen v obrazku
 	dw ascii_small_sirka ; sirka pismen v obrazku
+	db 0 ; pridani konstantni barvy
 pismo_doom:
 	db 12 ; vyska znaku
 	db 16 ; sirka obrazku
@@ -156,3 +156,12 @@ pismo_doom:
 	dw doom ; adresa obrazku
 	dw doom_pozice ; pozice pismen v obrazku
 	dw doom_sirka ; sirka pismen v obrazku
+	db 0 ; pridani konstantni barvy
+pismo_doom_svetlejsi:
+	db 12 ; vyska znaku
+	db 16 ; sirka obrazku
+	db 0x34 ; transparentni barva
+	dw doom ; adresa obrazku
+	dw doom_pozice ; pozice pismen v obrazku
+	dw doom_sirka ; sirka pismen v obrazku
+	db 4 ; pridani konstantni barvy

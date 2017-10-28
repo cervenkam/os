@@ -21,6 +21,9 @@ start:
 	mov bx,0x8129
 	mov word [aktivni_pismo],pismo_doom
 	call text_zobrazit
+	mov bx,0x9129
+	mov word [aktivni_pismo],pismo_doom_svetlejsi
+	call text_zobrazit
 	jmp $
 ;cyklus:
 	;xor ah,ah
