@@ -1,9 +1,6 @@
 bits 16
 org 0
-%define VYSKA_ZNAKU 6
-%define SIRKA_OBRAZKU 5
 %define SIRKA_OKNA 320
-%define TRANSPARENTNI 0x34
 ; nastavi video mod, bez parametru
 text_nastavit_video_mod:
 	push ax
@@ -23,13 +20,16 @@ text_zobrazit:
 	mov es,cx       ; presun video segmentu do extra segmentu
 	mov si,ax       ; nastaveni registru SI na hodnotu znaku ulozenou v AX
 	xor ax,ax       ; vynulovani registru AX
-	xor bx,bx       ; vynulovani registru BX
+	mov bx,[aktivni_pismo]
+	mov cx,[bx+7]
 	text_smycka:
 		lodsb                 ; nacteni znaku z adresy DS:SI do registru AL
 		cmp al, 0             ; porovnani na konec retezce
 		je text_konec         ; ukonceni v pripade konce retezce
+		xor bx,bx
 		mov bl,al
-		mov ah,[znaky_sirka+bx] ; pridani pozice	
+		add bx,cx
+		mov ah,[bx] ; pridani pozice	
 		call text_zobraz_znak ; volani zobrazeni znaku
 		mov al,ah
 		xor ah,ah
@@ -47,21 +47,38 @@ text_zobrazit:
 ; DI => pozice znaku ve video pameti
 text_zobraz_znak:
 	pusha
-	xor bh,bh
-	mov bl,al
-	mov bl,[znaky_pozice+bx]
+	mov bx,[aktivni_pismo]
+	;---------------;
+	;push ax
+	;mov ax, bx
+	;call pis16_registr
+	;mov al,ah
+	;call pis16_registr
+	;pop ax
+	;---------------;
+	push bx
+	mov bx,[bx+5]
 	push ax
-	mov ax,VYSKA_ZNAKU
-	mul bx
-	mov bx,SIRKA_OBRAZKU
-	mul bx
-	mov bx,ax
+	xor ah,ah
+	add bx,ax
 	pop ax
-	mov si,bx
-	add si,ascii
+	xor ch,ch
+	mov cl,[bx]
+	pop bx
+	push ax
+	xor ah,ah
+	mov al,[bx]
+	mul cl
+	mov cl,[bx+1]
+	mul cl
+	mov cx,ax
+	pop ax
+	mov si,cx
+	add si,[bx+3]
 	xor cx,cx
+	xor dh,dh
 	text_vnejsi_cyklus:
-		cmp cl,VYSKA_ZNAKU
+		cmp cl,[bx]
 		je text_konec_vnejsi_cyklus
 		xor ch,ch
 		text_vnitrni_cyklus:
@@ -70,7 +87,7 @@ text_zobraz_znak:
 			push ax
 			lodsb
 			inc di
-			cmp al,TRANSPARENTNI ; transparentni barva
+			cmp al,[bx+2] ; transparentni barva
 			je text_pokracuj
 				dec si
 				dec di
@@ -86,16 +103,19 @@ text_zobraz_znak:
 		xor ah,ah
 		add di,SIRKA_OKNA ; posun ve video pameti 
 		sub di,ax  ; na dalsi radek
-		add si,SIRKA_OBRAZKU  ; posun v obrazku 
+		mov dl,[bx+1]  ; posun o dany pocet pixelu
+		add si,dx  ; v obrazku
 		sub si,ax  ; na dalsi radek
 		pop ax
 		jmp text_vnejsi_cyklus
 	text_konec_vnejsi_cyklus:
 	popa
 	ret
-%include "browser/ascii.asm"
+%include "browser/ascii_small.asm"
+%include "browser/doom.asm"
 	
-znaky_pozice:
+doom_pozice:
+ascii_small_pozice:
 	times 48 db 0
 	db 26,27,28,29,30,31,32,33,34,35 ; pozice cislic
 	times 7 db 0
@@ -103,15 +123,15 @@ znaky_pozice:
 	times 6 db 0
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku
 	times 5 db 0
-;znaky_sirka:
-;	times 48 db 0
-;	db 11,7,11,11,11,11,11,11,11,11                                                  ; sirka cislic
-;	times 7 db 0
-;	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
-;	times 6 db 0
-;	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
-;	times 5 db 0
-znaky_sirka:
+doom_sirka:
+	times 48 db 0
+	db 11,7,11,11,11,11,11,11,11,11                                                  ; sirka cislic
+	times 7 db 0
+	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+	times 6 db 0
+	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
+	times 5 db 0
+ascii_small_sirka:
 	times 48 db 0
 	db 5,5,5,5,5,5,5,5,5,5                                 ; sirka cislic
 	times 7 db 0
@@ -119,3 +139,20 @@ znaky_sirka:
 	times 6 db 0
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 5 db 0
+
+aktivni_pismo:
+	dw pismo_male
+pismo_male:
+	db 6 ; vyska znaku
+	db 5 ; sirka obrazku
+	db 0x34 ; transparentni barva
+	dw ascii_small ; adresa obrazku
+	dw ascii_small_pozice ; pozice pismen v obrazku
+	dw ascii_small_sirka ; sirka pismen v obrazku
+pismo_doom:
+	db 12 ; vyska znaku
+	db 16 ; sirka obrazku
+	db 0x34 ; transparentni barva
+	dw doom ; adresa obrazku
+	dw doom_pozice ; pozice pismen v obrazku
+	dw doom_sirka ; sirka pismen v obrazku

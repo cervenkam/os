@@ -18,6 +18,9 @@ start:
 	mov ax,zprava
 	mov bx,0x7108
 	call text_zobrazit
+	mov bx,0x8129
+	mov word [aktivni_pismo],pismo_doom
+	call text_zobrazit
 	jmp $
 ;cyklus:
 	;xor ah,ah
@@ -36,4 +39,4 @@ konec:
 %include "browser/text.asm"
 zprava:
 	db "Spusteno",10,13,0
-times 0x1e00-($-$$) db 0
+times 0x2400-($-$$) db 0
