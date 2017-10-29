@@ -5,8 +5,6 @@ pis16:
 	pusha         ; ulozeni vsech registru do zasobniku
 	push ds
 	mov si, ax    ; nastaveni registru SI na hodnotu znaku ulozenou v AX
-	mov ax, cs
-	mov ds, ax
 	mov ah, 0x0e  ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
 pis16_smycka:
 	lodsb             ; nacteni znaku z adresy DS:SI do registru AL
@@ -44,11 +42,41 @@ pis16_registr_preved_znak:
 pis16_registr_preved_znak_konec:
 	ret
 
+; funkce vypise obsah zasobniku od BP do SP
+; bez parametru
+pis16_zasobnik:
+	pusha
+	push ds
+	mov ax, cs
+	mov ds, ax
+	mov ax, pis16_zasobnik_zprava
+	call pis16
+	mov si,sp
+	add si,8                           ; vyrovnani pusha
+pis16_zasobnik_smycka:
+	cmp si,bp
+	je pis16_zasobnik_konec
+	lodsb
+	push ax
+	mov al,ah
+	call pis16_registr
+	pop ax
+	call pis16_registr
+	mov ax, pis16_registry_odradkovani
+	call pis16
+	inc si
+	jmp pis16_zasobnik_smycka
+pis16_zasobnik_konec:
+	pop ds
+	popa
+	ret
+
 %define pocet_registru 8+6 ; IP nejde ;/
 ; funkce pis16_registry - vypis obsahu vsech registru
 ; zadne parametry ani vystupy
 pis16_registry:
 	pusha ; pro zachovani stavu registru
+	push ds
 	push ss
 	push gs
 	push fs
@@ -58,6 +86,8 @@ pis16_registry:
 	pusha ;ax, cx, dx, bx, sp, bp, si, di <- vrchol zasobniku (pro postupny vypis)
 	jc nastav_carry ; zaznamenani CF, predchozi instrukce pusha jej nezměni
 	xor dx, dx 
+	mov ax, cs
+	mov ds, ax
 pokracuj: 	
 	mov bx, pocet_registru
 	mov ax, pis16_registry_zprava
@@ -80,6 +110,7 @@ pis16_registry_smycka:
 	jne pis16_registry_smycka
 	mov ax, pis16_registry_odradkovani
 	call pis16
+	pop ds
 	popa
 	ret
 nastav_carry:
@@ -96,4 +127,6 @@ pis16_carry_flag:
 	db 10, 13, "Carry Flag:", 0
 pis16_registry_odradkovani:
 	db 10, 13, 0
+pis16_zasobnik_zprava:
+	db "Vypis zasobniku:",10,13,0
 

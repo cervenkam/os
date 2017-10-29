@@ -29,6 +29,9 @@ nacteni_sektoru:
 	mov ax,prohlizec          ; informace o sektorech prohlizece
 	mov bx,segment_prohlizec  ; informace o segmentu prohlizece
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	mov ax,obrazky            ; informace o sektorech obrazky
+	mov bx,segment_obrazky    ; informace o segmentu obrazku
+	call nacti_segmenty       ; nacteni sektoru do pameti
 	; konec cteni sektoru
 	jnc skok_jadro            ; skok do nacteneho jadra
 	dec si                    ; snizeni poctu pokusu o 1

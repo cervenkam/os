@@ -4,6 +4,7 @@ start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
 	mov es, ax                ; a zkopirovani i do extra segmentu
+	mov ss, ax                ; a i do stack segmentu
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
@@ -14,16 +15,18 @@ start:
 	;call pis16_registry
 	;stc ;nastavi CF  	
 	;call pis16_registry
-	call text_nastavit_video_mod
+	mov ax,0x9000
+	mov gs,ax
+	call 0x9000:0x0000
 	mov ax,zprava
 	mov bx,0x7108
-	call text_zobrazit
+	call 0x9000:0x0080
 	mov bx,0x8129
-	mov word [aktivni_pismo],pismo_doom
-	call text_zobrazit
+	mov word [gs:0x0040],0x004C
+	call 0x9000:0x0080
 	mov bx,0x9129
-	mov word [aktivni_pismo],pismo_doom_svetlejsi
-	call text_zobrazit
+	mov word [gs:0x0040],0x0056
+	call 0x9000:0x0080
 	jmp $
 ;cyklus:
 	;xor ah,ah
@@ -35,11 +38,10 @@ start:
 	;jmp cyklus
 konec:
 	jmp 0x1000:start
-;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
-;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 %include "print.asm"
 %include "characters.asm"         ; vlozeni funkci pro praci se znaky
-%include "browser/text.asm"
 zprava:
 	db "Spusteno",10,13,0
-times 0x2400-($-$$) db 0
+;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
+;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
+times 0x200-($-$$) db 0
