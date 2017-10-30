@@ -82,8 +82,7 @@ tabulka_skoku:
  	dw 0								; 45h
  	dw 0								; 46h
  	dw ziskej_nazev_aktualniho_adresare ; 47h
- 	times 12 dw 0						; 48h - 54h
- 	dw 0								; 55h
+ 	times 13 dw 0						; 48h - 55h
  	dw prejmenuj_soubor					; 56h
  	dw pomocna_casovy_udaj_o_souboru	; 57h
 
