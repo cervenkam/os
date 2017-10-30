@@ -1,5 +1,9 @@
 org 0
 bits 16
+interrupt_handler:
+call pis16_registry
+iret
+
 start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)

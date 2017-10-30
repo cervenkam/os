@@ -20,7 +20,7 @@ start:
 menu_smycka:
 	cmp dx,8
 	je menu_smycka_konec
-	call pis16_registry
+	;call pis16_registry
 	mov bx,dx
 	mov cx,[cs:tabulka_retezcu+bx]
 	mov bx,[cs:tabulka_pozic+bx]
