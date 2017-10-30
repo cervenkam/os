@@ -5,7 +5,6 @@ org 0
 video_preruseni:
 	push bx
 	push dx
-	call pis16_registry
 	mov bx,ax
 	shl bx,1
 	mov dx,[cs:tabulka_skoku+bx]
@@ -17,6 +16,7 @@ tabulka_skoku:
 	dw text_nastavit_video_mod
 	dw text_zobrazit
 	dw text_nastavit_font
+	dw zobraz_hodiny
 text_nastavit_video_mod:
 	push ax
 	mov ax, 0x13    ; nastaveni video modu 320x200, 256barev
@@ -183,4 +183,57 @@ ascii_small_sirka:
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 5 db 0
 %include "print.asm"
+
+; ziska cas z BIOSu - v BCD kodu
+; zadne parametry
+; CH - hodiny
+; CL - minuty
+; DH - sekundy
+; DL - je letni cas? 0/1
+ziskej_hodiny:
+	; TODO implementovat
+	; nelze pouzit int 0x1A/AH=0x02 ktere cely problem resi
+	; protoze to PC BIOS co ma QEMU nepodporuje, musi se volat int 0x1A/AH=0x00
+	xor cx,cx
+	xor dx,dx
+	ret
+zobraz_hodiny:
+	pusha
+	push ds
+	mov ax, cs
+	mov ds, ax
+	call ziskej_hodiny
+	xor bx,bx
+	xor ah,ah
+	mov al,ch
+	call zobraz_registr
+	mov al,cl
+	call zobraz_registr
+	mov al,dh
+	call zobraz_registr
+	mov cx,hodiny
+	call text_zobrazit
+	mov ax,hodiny
+	call pis16
+	pop ds
+	popa
+	ret		
+
+;nezachovava stav registru !!!!
+zobraz_registr:
+	ror al,4
+	push ax
+	and al,0xf
+	add al,0x30
+	mov [hodiny+bx],al
+	inc bx
+	pop ax
+	ror al,4
+	and al,0xf
+	add al,0x30
+	mov [hodiny+bx],al
+	add bx,2
+	ret
+hodiny:
+	db "00:00:00",0
 times 0x2400-($-$$) db 0

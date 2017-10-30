@@ -12,22 +12,28 @@ start:
 	
 	xor dx,dx
 	xor ax,ax
-	;int 0x22
+	int 0x22
 	mov ax,0x02
 	mov bx,0x02
 	int 0x22
-	mov ax,0x01
-menu_smycka:
-	cmp dx,8
-	je menu_smycka_konec
-	call pis16_registry
-	mov bx,dx
-	mov cx,[cs:tabulka_retezcu+bx]
-	mov bx,[cs:tabulka_pozic+bx]
+	mov ax,0x03
+	mov bx,0x1234
 	int 0x22
-	add dx,2
-	jmp menu_smycka
-menu_smycka_konec:
+	;mov ax,0x02
+	;mov bx,0x02
+	;int 0x22
+	;mov ax,0x01
+;menu_smycka:
+;	cmp dx,8
+;	je menu_smycka_konec
+;	call pis16_registry
+;	mov bx,dx
+;	mov cx,[cs:tabulka_retezcu+bx]
+;	mov bx,[cs:tabulka_pozic+bx]
+;	int 0x22
+;	add dx,2
+;	jmp menu_smycka
+m;enu_smycka_konec:
 	jmp segment_prohlizec:0x0000
 
 tabulka_retezcu:
