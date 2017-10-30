@@ -109,9 +109,9 @@ text_zobraz_znak:
 	push ax
 	xor ah,ah
 	mov al,[cs:bx]
-	mul cl
+	mul cx
 	mov cl,[cs:bx+1]
-	mul cl
+	mul cx
 	mov cx,ax
 	pop ax
 	mov si,cx
