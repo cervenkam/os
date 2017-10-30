@@ -1,19 +1,15 @@
 org 0
 bits 16
+interrupt_handler:          ;
+	sub 0x36 ax				; odectu konstantu 0x36 abych jel od zacatku jump_table
+
+
 start:
-	mov ax, cs                ; zkopirovani code segmentu do AX
-	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
-	mov es, ax                ; a zkopirovani i do extra segmentu
-	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
-	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
-
-	mov dword [0x0000:0x0021], dos_preruseni
-
-
-dos_preruseni:
-							; TODO implementovat jump table
-	nop
-	ret;
+	mov ax, cs              ; zkopirovani code segmentu do AX
+	mov ds, ax              ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
+	mov es, ax              ; a zkopirovani i do extra segmentu
+	mov bp, 0x9000          ; nastaveni bazove adresy zasobniku
+	mov sp, bp              ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
 velikost_disku:				; vypocet velikosti velikost_disku AH = 36h
 	ret
@@ -49,25 +45,38 @@ ziskej_casovy_udaj_o_souboru:		; procedura pro ziskani casoveho udaje o souboru 
 	ret
 nastav_casovy_udaj_o_souboru:		; procedura pro nastaveni casoveho udaje o souboru AH = 57h
 	ret
-
+pomocna_atributy_souboru:			; pomocna procedura pro obsluhuprace s atributem souboru
+	ret
+pomocna_casovy_udaj_o_souboru:		; pomocna procedura pro obsluhu prace s casovym udajem o souboru
+	ret
 konec:
 	jmp 0x1000:start
 
-.section .rodata
-	.align 4
-.skoky:
-	.long .nova_slozka
-	.long .smaz_slozku
-	.long .nastav_slozku
-	.long .novy_soubor
-	.long .otevri_soubor
-	.long .zapis_soubor
-	.long .precti_soubor
-	.long .zapis_soubor
-	.long .smaz_soubor
-	.long .nastav_pozici_v_souboru
-	.long .ziskej_atributy_souboru
-	.long .nastav_atributy_souboru
+jump_table:
+	dw velikost_disku:				; 36h
+	dw 0							; 37h, 38h
+	dw .nova_slozka					; 39h
+ 	dw .smaz_slozku					; 3Ah
+ 	dw .nastav_slozku				; 3Bh
+ 	dw .novy_soubor					; 3Ch
+ 	dw .otevri_soubor				; 3Dh
+ 	dw .zapis_soubor				; 3Eh
+ 	dw .precti_soubor				; 3Fh
+ 	dw .zapis_soubor				; 40h
+ 	dw .smaz_soubor					; 41h
+ 	dw .nastav_pozici_v_souboru		; 42h
+ 	dw .pomocna_atributy_souboru    ; 43h
+ 	dw 0							; 44h, 45h
+ 	db 0							; 46h
+ 	dw .ziskej_nazev_aktualniho_adresare ; 47h
+ 	times 14 dw 0					; 48h - 54h
+ 	db 0							; 55h
+ 	dw .prejmenuj_soubor:			; 56h
+ 	dw .pomocna_casovy_udaj_o_souboru	 ; 57h
+
+
+
+
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 times 0x200-($-$$) db 0
