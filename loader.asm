@@ -30,9 +30,9 @@ nacteni_sektoru:
 	;0x21 sluzby souboroveho systemu
 	mov word [es:0x0084],0x0000
 	mov word [es:0x0086],segment_filesystem
-	;0x08 test casovace
-	mov word [es:0x0030],0x0000
-	mov word [es:0x0032],segment_prohlizec	
+	;0x1C test casovace
+	mov word [es:0x0070],0x0000
+	mov word [es:0x0072],segment_prohlizec	
 	sti ;nastavit interrupty
 	pop es
 	; konec naveseni interruptu
