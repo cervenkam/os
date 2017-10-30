@@ -119,8 +119,8 @@ nastav_carry:
 	jmp pokracuj
 
 pis16_registry_texty:
-	db 10,13,"di: ",0,10,13,"si: ",0,10,13,"bp: ",0,10,13,"sp: ",0,10,13,"bx: ",0,10,13,"dx: ",0,10,13,"cx: ",0,10,13,"ax: ",0
-	db 10,13,"cs: ",0,10,13,"ds: ",0,10,13,"es: ",0,10,13,"fs: ",0,10,13,"gs: ",0,10,13,"ss: ",0
+	db 10,13,"di: ",0,"  si: ",0,"  bp: ",0,"  sp: ",0,"  bx: ",0,"  dx: ",0,"  cx: ",0,10,13,"ax: ",0
+	db "  cs: ",0,"  ds: ",0,"  es: ",0,"  fs: ",0,"  gs: ",0,"  ss: ",0
 pis16_registry_zprava:
 	db "Vypis registru:", 0
 pis16_carry_flag:

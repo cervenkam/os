@@ -3,17 +3,35 @@ org 0
 %define SIRKA_OKNA 320
 ; nastavi video mod, bez parametru
 video_preruseni:
-	call text_nastavit_video_mod
+	push bx
+	mov bx,ax
+	shl bx,1
+	mov dx,[cs:tabulka_skoku+bx]
+	pop bx
+	call dx
 	iret
+tabulka_skoku:
+	dw text_nastavit_video_mod
+	dw text_zobrazit
+	dw text_nastavit_font
 text_nastavit_video_mod:
 	push ax
 	mov ax, 0x13    ; nastaveni video modu 320x200, 256barev
 	int 0x10        ; nastaveni video modu
 	pop ax
 	ret
-times 0x40-($-$$) db 0
+text_nastavit_font:
+	pusha
+	mov ax,10
+	mul bx
+	mov bx,ax
+	add bx,pisma
+	mov word [cs:aktivni_pismo],bx
+	popa
+	ret
 aktivni_pismo:
 	dw pismo_male
+pisma:
 pismo_male:
 	db 6 ; vyska znaku
 	db 5 ; sirka obrazku
@@ -41,15 +59,15 @@ pismo_doom_svetlejsi:
 
 times 0x80-($-$$) db 0
 ; vykresli text na obrazovku ve video modu
-; DS:AX => adresa retezce
+; DS:CX => adresa retezce
 ; BX => pozice retezce
 text_zobrazit:
 	pusha
 	push es
 	mov di,bx       ; ulozeni pozice do DI
-	mov cx, 0xa000  ; nastaveni video segmentu do CX
-	mov es,cx       ; presun video segmentu do extra segmentu
-	mov si,ax       ; nastaveni registru SI na hodnotu znaku ulozenou v AX
+	mov ax, 0xa000  ; nastaveni video segmentu do CX
+	mov es,ax       ; presun video segmentu do extra segmentu
+	mov si,cx       ; nastaveni registru SI na hodnotu znaku ulozenou v AX
 	xor ax,ax       ; vynulovani registru AX
 	mov bx,[cs:aktivni_pismo]
 	mov cx,[cs:bx+7]
@@ -70,7 +88,7 @@ text_zobrazit:
 	text_konec:
 	pop es
 	popa  ; obnova vsech registru
-	retf
+	ret
 
 ; vykresli znak na obrazovku ve video modu
 ; AL => ASCII znak

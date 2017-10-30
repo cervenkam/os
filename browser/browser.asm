@@ -11,23 +11,21 @@ start:
 	mov ax, zprava
 	call pis16	
 	
-	;stc
-	;call pis16_registry
-	;stc ;nastavi CF  	
-	;call pis16_registry
 	mov ax,0x9000
 	mov gs,ax
-	;call 0x9000:0x0000
+	xor ax,ax
 	int 0x22
-	mov ax,zprava
+	mov ax,0x02
+	mov bx,0x01
+	int 0x22
+	mov ax,0x01
 	mov bx,0x7108
-	call 0x9000:0x0080
+	mov cx,zprava
+	int 0x22
 	mov bx,0x8129
-	mov word [gs:0x0040],0x004C
-	call 0x9000:0x0080
+	int 0x22
 	mov bx,0x9129
-	mov word [gs:0x0040],0x0056
-	call 0x9000:0x0080
+	int 0x22
 	jmp $
 ;cyklus:
 	;xor ah,ah

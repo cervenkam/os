@@ -16,6 +16,18 @@ nacteni_sektoru:
 	int 0x13                  ; volani sluzeb BIOSu
 	mov ah,0x02               ; vyber sluzby cteni z disku (0x02)
 	mov ch,0x00               ; cylindr 0
+	; naveseni interruptu
+	push es
+	xor ax, ax
+	mov es, ax
+	cli
+	mov word [es:0x0088],0x0000
+	mov word [es:0x008a],segment_obrazky
+	mov word [es:0x0084],0x0000
+	mov word [es:0x0086],segment_filesystem
+	sti
+	pop es
+	; konec naveseni interruptu
 	; cteni jednotlivych sektoru
 	mov ax,jadro              ; informace o sektorech jadra
 	mov bx,segment_jadra      ; informace o segmentu jadra
@@ -33,15 +45,6 @@ nacteni_sektoru:
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	; konec cteni sektoru
-	; naveseni interruptu na obrazky
-	push es
-	xor ax, ax
-	mov es, ax
-	cli
-	mov word [es:0x0088],0x0000
-	mov word [es:0x008a],0x9000
-	sti
-	pop es
 	jnc skok_jadro            ; skok do nacteneho jadra
 	dec si                    ; snizeni poctu pokusu o 1
 	cmp si, 0                 ; test na vycerpani pokusu
