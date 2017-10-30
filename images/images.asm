@@ -2,12 +2,15 @@ bits 16
 org 0
 %define SIRKA_OKNA 320
 ; nastavi video mod, bez parametru
+video_preruseni:
+	call text_nastavit_video_mod
+	iret
 text_nastavit_video_mod:
 	push ax
 	mov ax, 0x13    ; nastaveni video modu 320x200, 256barev
 	int 0x10        ; nastaveni video modu
 	pop ax
-	retf
+	ret
 times 0x40-($-$$) db 0
 aktivni_pismo:
 	dw pismo_male

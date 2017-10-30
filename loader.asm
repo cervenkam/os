@@ -33,6 +33,15 @@ nacteni_sektoru:
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	; konec cteni sektoru
+	; naveseni interruptu na obrazky
+	push es
+	xor ax, ax
+	mov es, ax
+	cli
+	mov word [es:0x0088],0x0000
+	mov word [es:0x008a],0x9000
+	sti
+	pop es
 	jnc skok_jadro            ; skok do nacteneho jadra
 	dec si                    ; snizeni poctu pokusu o 1
 	cmp si, 0                 ; test na vycerpani pokusu

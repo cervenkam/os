@@ -8,6 +8,7 @@ start:
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
+	
 	jmp segment_prohlizec:0x0000
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky

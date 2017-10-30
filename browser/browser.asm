@@ -17,7 +17,8 @@ start:
 	;call pis16_registry
 	mov ax,0x9000
 	mov gs,ax
-	call 0x9000:0x0000
+	;call 0x9000:0x0000
+	int 0x22
 	mov ax,zprava
 	mov bx,0x7108
 	call 0x9000:0x0080
