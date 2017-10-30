@@ -4,11 +4,14 @@ org 0
 ; nastavi video mod, bez parametru
 video_preruseni:
 	push bx
+	push dx
+	call pis16_registry
 	mov bx,ax
 	shl bx,1
 	mov dx,[cs:tabulka_skoku+bx]
-	pop bx
 	call dx
+	pop dx
+	pop bx
 	iret
 tabulka_skoku:
 	dw text_nastavit_video_mod
@@ -57,7 +60,6 @@ pismo_doom_svetlejsi:
 	dw doom_sirka ; sirka pismen v obrazku
 	db 4 ; pridani konstantni barvy
 
-times 0x80-($-$$) db 0
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce
 ; BX => pozice retezce

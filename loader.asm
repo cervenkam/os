@@ -11,6 +11,9 @@ start:
 
 	mov si, 0x03              ; tri pokusy pro nacteni sektoru
 nacteni_sektoru:
+	cmp si, 0                 ; test na vycerpani pokusu
+	je restart                ; opakovani nacitani pri dostatecnem poctu pokusu
+	dec si                    ; snizeni poctu pokusu o 1
 	mov dx,0x0080             ; vyber pevneho disku (0x80), hlavy 0 (0x00)
 	xor ax,ax                 ; zadost o restartovani disku (sluzba 0x00)
 	int 0x13                  ; volani sluzeb BIOSu
@@ -32,25 +35,26 @@ nacteni_sektoru:
 	mov ax,jadro              ; informace o sektorech jadra
 	mov bx,segment_jadra      ; informace o segmentu jadra
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,filesystem         ; informace o sektorech filesystemu
 	mov bx,segment_filesystem ; informace o segmentu filesystemu
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,editor             ; informace o sektorech editoru
 	mov bx,segment_editor     ; informace o segmentu editoru
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,prohlizec          ; informace o sektorech prohlizece
 	mov bx,segment_prohlizec  ; informace o segmentu prohlizece
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,obrazky            ; informace o sektorech obrazky
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	; konec cteni sektoru
-	jnc skok_jadro            ; skok do nacteneho jadra
-	dec si                    ; snizeni poctu pokusu o 1
-	cmp si, 0                 ; test na vycerpani pokusu
-	jne nacteni_sektoru       ; opakovani nacitani pri dostatecnem poctu pokusu
+	jmp skok_jadro            ; skok do nacteneho jadra
 restart:
-	call pis16_registry
 	mov ax,zprava_restart
 	call pis16
 	xor ax,ax                 ; vyber sluzby BIOSu - cekani na stisk klavesy
@@ -68,7 +72,24 @@ nacti_segmenty:
 	int 0x13
 	ret
 
-%include "print.asm"
+; funkce pis16, pise zpravu v realnem 16bitovem rezimu
+; => DS:AX - adresa zpravy
+pis16:
+	pusha         ; ulozeni vsech registru do zasobniku
+	push ds
+	mov si, ax    ; nastaveni registru SI na hodnotu znaku ulozenou v AX
+	mov ah, 0x0e  ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
+pis16_smycka:
+	lodsb             ; nacteni znaku z adresy DS:SI do registru AL
+	cmp al, 0         ; porovnani na konec retezce
+	je pis16_konec    ; ukonceni v pripade konce retezce
+	int 0x10          ; volani video sluby BIOSu
+	jmp pis16_smycka  ; opetovne volani, dokud neni konec retezce
+pis16_konec:
+	pop ds
+	popa  ; obnova vsech registru
+	ret   ; ukonceni podprogramu vypisu v 16tibitovem rezimu
+
 zprava_boot:
 	db "Nacteno!" ,0
 zprava_restart:

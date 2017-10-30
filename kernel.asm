@@ -10,42 +10,49 @@ start:
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
 	
+	xor dx,dx
 	xor ax,ax
-	int 0x22
+	;int 0x22
 	mov ax,0x02
 	mov bx,0x02
 	int 0x22
 	mov ax,0x01
-	mov bx,0x7108
-	mov cx,retezec_prohlizec
+menu_smycka:
+	cmp dx,8
+	je menu_smycka_konec
+	call pis16_registry
+	mov bx,dx
+	mov cx,[cs:tabulka_retezcu+bx]
+	mov bx,[cs:tabulka_pozic+bx]
 	int 0x22
-	mov bx,0x8129
-	int 0x22
-	mov bx,0x9129
-	int 0x22
+	add dx,2
+	jmp menu_smycka
+menu_smycka_konec:
 	jmp segment_prohlizec:0x0000
+
 tabulka_retezcu:
 	dw retezec_prohlizec
 	dw retezec_editor
 	dw retezec_hra
 	dw retezec_neco
 tabulka_pozic:
-	dw 0x3000
-	dw 0x4000
-	dw 0x5000
-	dw 0x6000
+	dw 0x1234
+	dw 0x2345
+	dw 0x3456
+	dw 0x4567
 retezec_prohlizec:
-	dw "tuvwxyz",0
+	db "1Prohlizec",0
 retezec_editor:
-	dw "Editor",0
+	db "2Editor",0
 retezec_hra:
-	dw "Hra",0
+	db "3Hra",0
 retezec_neco:
-	dw "Neco jineho",0
+	db "4Neco jineho",0
 konec:
 	jmp 0x1000:start
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
+%include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
-times 0x1200-($-$$) db 0
+times 0x1400-($-$$) db 0

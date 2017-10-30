@@ -1,7 +1,8 @@
 org 0
 bits 16
 interrupt_handler:          ;
-	sub 0x36 ax				; odectu konstantu 0x36 abych jel od zacatku jump_table
+	sub ax,0x36				; odectu konstantu 0x36 abych jel od zacatku jump_table
+	iret
 
 
 start:
@@ -53,26 +54,26 @@ konec:
 	jmp 0x1000:start
 
 jump_table:
-	dw velikost_disku:				; 36h
+	dw velikost_disku				; 36h
 	dw 0							; 37h, 38h
-	dw .nova_slozka					; 39h
- 	dw .smaz_slozku					; 3Ah
- 	dw .nastav_slozku				; 3Bh
- 	dw .novy_soubor					; 3Ch
- 	dw .otevri_soubor				; 3Dh
- 	dw .zapis_soubor				; 3Eh
- 	dw .precti_soubor				; 3Fh
- 	dw .zapis_soubor				; 40h
- 	dw .smaz_soubor					; 41h
- 	dw .nastav_pozici_v_souboru		; 42h
- 	dw .pomocna_atributy_souboru    ; 43h
+	dw nova_slozka					; 39h
+ 	dw smaz_slozku					; 3Ah
+ 	dw nastav_slozku				; 3Bh
+ 	dw novy_soubor					; 3Ch
+ 	dw otevri_soubor				; 3Dh
+ 	dw zapis_soubor				; 3Eh
+ 	dw precti_soubor				; 3Fh
+ 	dw zapis_soubor				; 40h
+ 	dw smaz_soubor					; 41h
+ 	dw nastav_pozici_v_souboru		; 42h
+ 	dw pomocna_atributy_souboru    ; 43h
  	dw 0							; 44h, 45h
  	db 0							; 46h
- 	dw .ziskej_nazev_aktualniho_adresare ; 47h
+ 	dw ziskej_nazev_aktualniho_adresare ; 47h
  	times 14 dw 0					; 48h - 54h
  	db 0							; 55h
- 	dw .prejmenuj_soubor:			; 56h
- 	dw .pomocna_casovy_udaj_o_souboru	 ; 57h
+ 	dw prejmenuj_soubor			; 56h
+ 	dw pomocna_casovy_udaj_o_souboru	 ; 57h
 
 
 

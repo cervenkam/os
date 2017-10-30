@@ -1,6 +1,6 @@
 ;nasleduji definice segmentu a jejich velikosti (v sektorech po 512bajtech), lze menit jen velikosti
 %define segment_jadra 0x1000
-%define velikost_jadro 9
+%define velikost_jadro 10
 %define segment_filesystem 0x2000
 %define velikost_filesystem 1
 %define segment_editor 0x3000
