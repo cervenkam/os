@@ -8,16 +8,22 @@ start:
 	mov ss, ax                ; a i do stack segmentu
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
+
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
+	call pis16_registry
+opakovani:
+	xor ax,ax
+	int 0x16
+	call pis16_registry
+	jmp opakovani
+
 	
 	xor dx,dx
 	xor ax,ax
-	int 0x22
+	;int 0x22
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
-	mov ax,0x03
-	mov bx,0x1234
 	mov ax,0x01
 menu_smycka:
 	cmp dx,8
@@ -29,8 +35,78 @@ menu_smycka:
 	add dx,2
 	jmp menu_smycka
 menu_smycka_konec:
-	jmp segment_prohlizec:0x0000
-
+	xor ax,ax
+	call pis16_registr
+	int 0x16	
+	mov al,ah
+	call pis16_registr
+	jmp $
+	cmp ah,0x48 ;sipka nahoru
+	je sipka_nahoru
+	cmp ah,0x50 ;sipka dolu
+	je sipka_dolu	
+	cmp ah,0x1C ;enter
+	je enter
+	jmp menu_smycka_konec
+sipka_nahoru:
+	cmp byte [pozice],0
+	je rotuj_dolu
+	mov bl,[pozice]
+	mov [predchozi_pozice],bl
+	dec byte [pozice]
+	jmp prekresli
+rotuj_dolu:
+	mov bl,[pocet_menu_1]
+	mov [pozice],bl
+	mov byte [predchozi_pozice],0
+	jmp prekresli
+sipka_dolu:
+	mov bl,[pocet_menu_1]
+	cmp bl,[pozice]
+	je rotuj_nahoru
+	mov [predchozi_pozice],bl
+	inc byte [pozice]
+	jmp prekresli
+rotuj_nahoru:
+	mov [predchozi_pozice],bl
+	mov byte [pozice],0
+	jmp prekresli
+prekresli:
+	xor bh,bh
+	mov ax,0x02
+	mov bx,0x01
+	int 0x22
+	mov ax,0x01
+	mov bl,[predchozi_pozice]
+	mov cx,[cs:tabulka_retezcu+bx]
+	mov bx,[cs:tabulka_pozic+bx]
+	int 0x22
+	mov ax,0x02
+	mov bx,0x02
+	int 0x22
+	mov ax,0x01
+	mov bl,[pozice]
+	mov cx,[cs:tabulka_retezcu+bx]
+	mov bx,[cs:tabulka_pozic+bx]
+	int 0x22
+	jmp menu_smycka_konec
+enter:
+	mov bl,[pozice]
+	xor bh,bh
+	shl bx,1
+	mov ax,[tabulka_segmentu+bx]
+	mov [cilova_adresa],ax
+	jmp [cilova_adresa]
+	
+cilova_adresa:
+	dw 0x1000
+	dw 0x0000
+pocet_menu_1:
+	db 4
+pozice:
+	db 0
+predchozi_pozice:
+	db 0
 tabulka_retezcu:
 	dw retezec_prohlizec
 	dw retezec_editor
@@ -41,6 +117,11 @@ tabulka_pozic:
 	dw 0x3000
 	dw 0x47d0
 	dw 0x6940
+tabulka_segmentu:
+	dw segment_prohlizec
+	dw segment_editor
+	dw segment_editor ;TODO
+	dw segment_editor ;TODO
 retezec_prohlizec:
 	db "Prohlizec",0
 retezec_editor:
