@@ -106,7 +106,7 @@ tabulka_pozic:
 tabulka_segmentu:
 	dw segment_prohlizec
 	dw segment_editor
-	dw segment_editor ;TODO
+	dw segment_hra ;TODO
 	dw segment_editor ;TODO
 retezec_prohlizec:
 	db "Prohlizec",0

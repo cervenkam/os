@@ -36,6 +36,10 @@ nacteni_sektoru:
 	mov bx,segment_prohlizec  ; informace o segmentu prohlizece
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	jc restart
+	mov ax,hra                ; informace o sektorech hry
+	mov bx,segment_hra        ; informace o segmentu hry
+	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,obrazky            ; informace o sektorech obrazky
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
