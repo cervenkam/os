@@ -53,8 +53,8 @@ nacteni_sektoru:
 	mov word [es:0x0084],0x0000
 	mov word [es:0x0086],segment_filesystem
 	;0x1C test casovace
-	mov word [es:0x0070],0x0000
-	mov word [es:0x0072],segment_prohlizec	
+	;mov word [es:0x0070],0x0000
+	;mov word [es:0x0072],segment_prohlizec	
 	sti ;nastavit interrupty
 	pop es
 	; konec naveseni interruptu

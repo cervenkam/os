@@ -10,17 +10,10 @@ start:
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
-	call pis16_registry
-opakovani:
-	xor ax,ax
-	int 0x16
-	call pis16_registry
-	jmp opakovani
-
 	
 	xor dx,dx
 	xor ax,ax
-	;int 0x22
+	int 0x22
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
@@ -36,11 +29,8 @@ menu_smycka:
 	jmp menu_smycka
 menu_smycka_konec:
 	xor ax,ax
-	call pis16_registr
 	int 0x16	
 	mov al,ah
-	call pis16_registr
-	jmp $
 	cmp ah,0x48 ;sipka nahoru
 	je sipka_nahoru
 	cmp ah,0x50 ;sipka dolu
