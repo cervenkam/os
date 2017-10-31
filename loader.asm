@@ -21,7 +21,7 @@ nacteni_sektoru:
 	mov ch,0x00               ; cylindr 0
 	; cteni jednotlivych sektoru
 	mov ax,jadro              ; informace o sektorech jadra
-	mov bx,segment_jadra      ; informace o segmentu jadra
+	mov bx,segment_jadro      ; informace o segmentu jadra
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	jc restart
 	mov ax,filesystem         ; informace o sektorech filesystemu
@@ -67,7 +67,7 @@ restart:
 	db 0xea, 0, 0, 0xff, 0xff ; restart
 
 skok_jadro:
-	jmp segment_jadra:0x0000
+	jmp segment_jadro:0x0000
 
 nacti_segmenty:
 	mov cl,ah

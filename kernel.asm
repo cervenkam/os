@@ -30,7 +30,8 @@ menu_smycka:
 menu_smycka_konec:
 	xor ax,ax
 	int 0x16	
-	mov al,ah
+	mov dl,[pozice]
+	mov [predchozi_pozice],dl
 	cmp ah,0x48 ;sipka nahoru
 	je sipka_nahoru
 	cmp ah,0x50 ;sipka dolu
@@ -41,33 +42,28 @@ menu_smycka_konec:
 sipka_nahoru:
 	cmp byte [pozice],0
 	je rotuj_dolu
-	mov bl,[pozice]
-	mov [predchozi_pozice],bl
 	dec byte [pozice]
 	jmp prekresli
 rotuj_dolu:
 	mov bl,[pocet_menu_1]
 	mov [pozice],bl
-	mov byte [predchozi_pozice],0
 	jmp prekresli
 sipka_dolu:
-	mov bl,[pocet_menu_1]
-	cmp bl,[pozice]
+	mov bl,[pozice]
+	cmp bl,[pocet_menu_1]
 	je rotuj_nahoru
-	mov [predchozi_pozice],bl
 	inc byte [pozice]
 	jmp prekresli
 rotuj_nahoru:
-	mov [predchozi_pozice],bl
 	mov byte [pozice],0
 	jmp prekresli
 prekresli:
-	xor bh,bh
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
 	mov ax,0x01
 	mov bl,[predchozi_pozice]
+	shl bx,1
 	mov cx,[cs:tabulka_retezcu+bx]
 	mov bx,[cs:tabulka_pozic+bx]
 	int 0x22
@@ -76,6 +72,7 @@ prekresli:
 	int 0x22
 	mov ax,0x01
 	mov bl,[pozice]
+	shl bx,1
 	mov cx,[cs:tabulka_retezcu+bx]
 	mov bx,[cs:tabulka_pozic+bx]
 	int 0x22
@@ -85,16 +82,15 @@ enter:
 	xor bh,bh
 	shl bx,1
 	mov ax,[tabulka_segmentu+bx]
-	mov [cilova_adresa],ax
-	jmp [cilova_adresa]
+	push ax
+	xor bx,bx
+	push bx
+	retf
 	
-cilova_adresa:
-	dw 0x1000
-	dw 0x0000
 pocet_menu_1:
-	db 4
+	db 3
 pozice:
-	db 0
+	db 3
 predchozi_pozice:
 	db 0
 tabulka_retezcu:
