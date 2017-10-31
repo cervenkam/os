@@ -12,28 +12,23 @@ start:
 	
 	xor dx,dx
 	xor ax,ax
-	;int 0x22
+	int 0x22
 	mov ax,0x02
-	mov bx,0x02
-	;int 0x22
+	mov bx,0x01
+	int 0x22
 	mov ax,0x03
 	mov bx,0x1234
-	;int 0x22
-	;mov ax,0x02
-	;mov bx,0x02
-	;int 0x22
-	;mov ax,0x01
-;menu_smycka:
-;	cmp dx,8
-;	je menu_smycka_konec
-;	call pis16_registry
-;	mov bx,dx
-;	mov cx,[cs:tabulka_retezcu+bx]
-;	mov bx,[cs:tabulka_pozic+bx]
-;	int 0x22
-;	add dx,2
-;	jmp menu_smycka
-;menu_smycka_konec:
+	mov ax,0x01
+menu_smycka:
+	cmp dx,8
+	je menu_smycka_konec
+	mov bx,dx
+	mov cx,[cs:tabulka_retezcu+bx]
+	mov bx,[cs:tabulka_pozic+bx]
+	int 0x22
+	add dx,2
+	jmp menu_smycka
+menu_smycka_konec:
 	jmp segment_prohlizec:0x0000
 
 tabulka_retezcu:
@@ -42,18 +37,18 @@ tabulka_retezcu:
 	dw retezec_hra
 	dw retezec_neco
 tabulka_pozic:
-	dw 0x1234
-	dw 0x2345
-	dw 0x3456
-	dw 0x4567
+	dw 0x11e0
+	dw 0x3000
+	dw 0x47d0
+	dw 0x6940
 retezec_prohlizec:
-	db "1Prohlizec",0
+	db "Prohlizec",0
 retezec_editor:
-	db "2Editor",0
+	db "Editor",0
 retezec_hra:
-	db "3Hra",0
+	db "Hra",0
 retezec_neco:
-	db "4Neco jineho",0
+	db "Neco jineho",0
 konec:
 	jmp 0x1000:start
 

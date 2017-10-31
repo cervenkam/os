@@ -3,14 +3,14 @@ org 0
 %define SIRKA_OKNA 320
 ; nastavi video mod, bez parametru
 video_preruseni:
-	push bx
 	push dx
+	push bx
 	mov bx,ax
 	shl bx,1
 	mov dx,[cs:tabulka_skoku+bx]
+	pop bx
 	call dx
 	pop dx
-	pop bx
 	iret
 tabulka_skoku:
 	dw text_nastavit_video_mod
