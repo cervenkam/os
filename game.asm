@@ -1,5 +1,6 @@
 org   0
 bits  16
+%include "consts.asm"
 
 sizeof_level equ 36 ; size of level in bytes
 levels_count equ (levels_end-levels)/sizeof_level
@@ -301,16 +302,14 @@ win:
 		push WORD (yellow<<8 | '$')
 		call draw_char
 
-		cmp cx, 0xffff
+		cmp cx, 0x100
 		jnz short .endif
 		.end:
-			cli
-			hlt
-			jmp short .end
+			jmp segment_jadro:0x0000
 		.endif:
 
 		push WORD 0
-		push WORD 16384
+		push WORD 40
 		call sleep
 
 		inc cx
@@ -319,24 +318,24 @@ win:
 
 ; Levels' layouts 8x8 (0 - void, 1 - wall), 2 bytes for start pos, 2 bytes for finish pos
 levels:
-;db 11111111b, 11111111b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 10000000b, 00000001b
-;db 11111111b, 11111111b
-;db 1, 1
-;db 14, 14
+db 11111111b, 11111111b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 10000000b, 00000001b
+db 11111111b, 11111111b
+db 1, 1
+db 14, 14
 
 db 11111111b, 11111111b
 db 10110000b, 00000011b
@@ -369,5 +368,5 @@ delta_y db 0
 
 buffer db 0 ; Mainly used for saving an block info
 
-times 0x200-($-$$) db 0
+times 0x400-($-$$) db 0
 

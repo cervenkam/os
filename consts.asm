@@ -8,7 +8,7 @@
 %define segment_prohlizec 0x4000
 %define velikost_prohlizec 1
 %define segment_hra 0x5000
-%define velikost_hra 1
+%define velikost_hra 2
 %define segment_obrazky 0x9000
 %define velikost_obrazky 18
 ;nemenit nasledujici definice:
