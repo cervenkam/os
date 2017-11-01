@@ -184,18 +184,49 @@ ascii_small_sirka:
 	times 5 db 0
 %include "print.asm"
 
-; ziska cas z BIOSu - v BCD kodu
+; ziska cas z BIOSu
 ; zadne parametry
 ; CH - hodiny
 ; CL - minuty
 ; DH - sekundy
-; DL - je letni cas? 0/1
 ziskej_hodiny:
-	; TODO implementovat
-	; nelze pouzit int 0x1A/AH=0x02 ktere cely problem resi
-	; protoze to PC BIOS co ma QEMU nepodporuje, musi se volat int 0x1A/AH=0x00
-	xor cx,cx
-	xor dx,dx
+	push ax
+	push bx
+	push dx
+	xor ax,ax
+	int 0x1a
+	mov bx,dx
+	mov ax,cx
+	push bx
+	mov bx,540
+	mul bx
+	pop bx
+	mov cx,ax
+	mov ax,bx
+	push bx
+	mov bx,540
+	mul bx
+	pop bx
+	add cx,dx
+	mov dx,cx
+	push bx
+	mov bx,19663
+	div bx
+	pop bx
+	mov bx,ax
+	mov cx,60
+	div cx
+	push dx
+	div cx
+	push dx
+	mov ch,al
+	pop ax
+	mov cl,al
+	pop ax
+	pop dx
+	mov dh,al
+	pop bx
+	pop ax
 	ret
 zobraz_hodiny:
 	pusha
