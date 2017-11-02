@@ -51,14 +51,8 @@ menu_smycka_konec:
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0
 	;0x08 test casovace
-	mov ax,[es:0x0070]
-	call pis16_registry
-	mov [cs:stare_int0x08],ax
-	call pis16_registry
-	mov ax,[es:0x0072]
-	mov [cs:stare_int0x08+2],ax
-	;mov word [es:0x0070],interrupt
-	;mov word [es:0x0072],cs
+	mov word [es:0x0020],interrupt
+	mov word [es:0x0022],cs
 	pop es
 	sti ;nastavit interrupty
 
@@ -153,25 +147,23 @@ retezec_neco:
 konec:
 	jmp 0x1000:start
 interrupt:
-	call pis16_registry
-	;cmp byte [pocitadlo],0
-	;jne pokracuj_interrupt
-	;push ax
-	;mov ax,0x03
-	;int 0x22
-	;pop ax
-	;mov byte [pocitadlo],17
-;pokracuj_interrupt:
-	;dec byte [pocitadlo]
-	;pop es
-	;push ax
-	;mov al,0x20
-	;out 0x20,al
-	;pop ax
-	jmp [cs:stare_int0x08]
-stare_int0x08:
-	dw 0
-	dw 0
+	cli
+	pushf
+	call 0xf000:0xfea5
+	cmp byte [pocitadlo],0
+	jne pokracuj_interrupt
+	push ax
+	mov ax,0x03
+	int 0x22
+	pop ax
+	mov byte [pocitadlo],17
+pokracuj_interrupt:
+	dec byte [pocitadlo]
+	push ax
+	mov al,0x20
+	out 0x20,al
+	pop ax
+	iret
 pocitadlo:
 	db 17
 
