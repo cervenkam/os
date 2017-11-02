@@ -45,23 +45,6 @@ nacteni_sektoru:
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	jc restart
 	; konec cteni sektoru
-	; naveseni interruptu
-	push es
-	xor ax, ax
-	mov es, ax 		  ; segmentovy registr = 0
-	cli 			  ; vycistit interrupty
-	;0x22 video sluzby, adresa obsluhy je potom 0x9000:0x0000 (zacatek segmentu)
-	mov word [es:0x0088],0x0000
-	mov word [es:0x008a],segment_obrazky
-	;0x21 sluzby souboroveho systemu
-	mov word [es:0x0084],0x0000
-	mov word [es:0x0086],segment_filesystem
-	;0x1C test casovace
-	;mov word [es:0x0070],0x0000
-	;mov word [es:0x0072],segment_prohlizec	
-	sti ;nastavit interrupty
-	pop es
-	; konec naveseni interruptu
 	jmp skok_jadro            ; skok do nacteneho jadra
 restart:
 	mov ax,zprava_restart

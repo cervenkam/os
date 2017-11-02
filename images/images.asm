@@ -246,6 +246,7 @@ zobraz_hodiny:
 	call zobraz_registr
 	mov cx,hodiny
 	mov bx,0xee0e
+	mov word [aktivni_pismo],pismo_male
 	call text_zobrazit
 	pop ds
 	popa

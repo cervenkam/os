@@ -17,5 +17,9 @@ images.bin: $(wildcard images/*.asm) print.asm
 	nasm -f bin images/images.asm -o $@
 game.bin: game.asm
 	nasm -f bin game.asm -o $@
+timertest.bin: timertest.asm
+	nasm -f bin timertest.asm -o $@
+timertest: timertest.bin
+	qemu-system-x86_64 -drive file=timertest.bin,format=raw
 clean:
 	find . -type f -name '*.bin' ! -name 'drive.bin' -delete
