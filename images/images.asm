@@ -193,8 +193,14 @@ ziskej_hodiny:
 	push ax
 	push bx
 	push dx
+	push es
+	mov ax,0x0040
+	mov es,ax
 	xor ax,ax
-	int 0x1a
+	mov dx,[es:0x006c]
+	mov cx,[es:0x006e]
+	pop es
+	; az sem je to OK
 	mov bx,dx
 	mov ax,cx
 	push bx
@@ -215,8 +221,9 @@ ziskej_hodiny:
 	xor dx,dx
 	pop bx
 	mov bx,ax
-	mov cx,60
+	mov cx,30
 	div cx
+	mov cx,60
 	push dx
 	xor dx,dx
 	div cx
@@ -243,6 +250,7 @@ zobraz_hodiny:
 	mov al,cl
 	call zobraz_registr
 	mov al,dh
+	shl al,1
 	call zobraz_registr
 	mov cx,hodiny
 	mov bx,0xee0e
