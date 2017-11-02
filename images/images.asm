@@ -223,6 +223,10 @@ ziskej_hodiny:
 	mov bx,ax
 	mov cx,30
 	div cx
+	shl dx,1
+	;mov cx,[es:0x006c]
+	;and cx,1
+	;add dx,cx
 	mov cx,60
 	push dx
 	xor dx,dx
@@ -250,7 +254,6 @@ zobraz_hodiny:
 	mov al,cl
 	call zobraz_registr
 	mov al,dh
-	shl al,1
 	call zobraz_registr
 	mov cx,hodiny
 	mov bx,0xee0e

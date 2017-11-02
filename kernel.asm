@@ -52,7 +52,9 @@ menu_smycka_konec:
 	mov es, ax 		  ; segmentovy registr = 0
 	;0x08 test casovace
 	mov ax,[es:0x0070]
+	call pis16_registry
 	mov [cs:stare_int0x08],ax
+	call pis16_registry
 	mov ax,[es:0x0072]
 	mov [cs:stare_int0x08+2],ax
 	;mov word [es:0x0070],interrupt
