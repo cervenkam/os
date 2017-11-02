@@ -14,6 +14,8 @@ start:
 	xor dx,dx
 	xor ax,ax
 	int 0x22
+	mov ax,0x03
+	int 0x22
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22

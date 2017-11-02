@@ -212,11 +212,13 @@ ziskej_hodiny:
 	push bx
 	mov bx,19663
 	div bx
+	xor dx,dx
 	pop bx
 	mov bx,ax
 	mov cx,60
 	div cx
 	push dx
+	xor dx,dx
 	div cx
 	push dx
 	mov ch,al
@@ -243,27 +245,26 @@ zobraz_hodiny:
 	mov al,dh
 	call zobraz_registr
 	mov cx,hodiny
+	mov bx,0xee0e
 	call text_zobrazit
-	mov ax,hodiny
-	call pis16
 	pop ds
 	popa
 	ret		
 
-;nezachovava stav registru !!!!
 zobraz_registr:
-	ror al,4
 	push ax
-	and al,0xf
-	add al,0x30
+	push cx
+	push dx
+	mov cx,10
+	div cl
+	add ax,0x3030
 	mov [hodiny+bx],al
 	inc bx
-	pop ax
-	ror al,4
-	and al,0xf
-	add al,0x30
-	mov [hodiny+bx],al
+	mov [hodiny+bx],ah
 	add bx,2
+	pop dx
+	pop cx
+	pop ax
 	ret
 hodiny:
 	db "00:00:00",0
