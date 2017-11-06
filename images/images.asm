@@ -58,7 +58,7 @@ pismo_doom_svetlejsi:
 	dw doom ; adresa obrazku
 	dw doom_pozice ; pozice pismen v obrazku
 	dw doom_sirka ; sirka pismen v obrazku
-	db 139 ; pridani konstantni barvy
+	db 1*16+11 ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce
