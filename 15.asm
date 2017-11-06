@@ -32,7 +32,9 @@ nakresli_vse:
 		inc ah
 		jmp vnejsi_smycka
 	konec_vnejsi_smycky:
+	call najdi_pozici
 	xor ax,ax
+stisk_klavesy:
 	int 0x16	
 	cmp ah,0x48
 	je sipka_nahoru
@@ -43,11 +45,37 @@ nakresli_vse:
 	cmp ah,0x4D
 	je sipka_vpravo
 sipka_nahoru:
+	cmp bx,4
+	jl stisk_klavesy
+	mov ax,bx
+	sub ax,4
+	call prehod_pole
+	jmp stisk_klavesy
 sipka_dolu:
 sipka_vlevo:
 sipka_vpravo:
 konec:
 	jmp segment_jadro:0x0000
+prehod_pole:
+	pusha
+	mov cl,[cs:aktualni_hra+bx]
+	push bx
+	mov bx,ax
+	mov ch,[cs:aktualni_hra+bx]
+	mov [cs:aktualni_hra+bx],cl
+	pop bx
+	mov [cs:aktualni_hra+bx],ch
+	mov ah,al
+	shr ah,2	
+	and al,3
+	call nakresli_jedno_pole
+	mov ax,bx
+	mov ah,al
+	shr ah,2	
+	and al,3
+	call nakresli_jedno_pole
+	popa
+	ret
 nacti_hru:
 	pusha
 	xor bx,bx
@@ -67,7 +95,6 @@ nacti_hru:
 	popa
 	ret
 najdi_pozici:
-	push bx
 	xor bx,bx
 	smycka_pozice:
 		cmp bx,16
@@ -77,16 +104,10 @@ najdi_pozici:
 		inc bx
 		jmp smycka_pozice
 	konec_smycka_pozice:
-	pop bx
 	ret
 nakresli_jedno_pole:
 	pusha
-	push ax
 	call nastav_pozice
-	mov ax,0x4
-	mov bx,pozice
-	int 0x22
-	pop ax
 	push ax
 	mov bx,ax
 	shr bx,6
@@ -95,7 +116,14 @@ nakresli_jedno_pole:
 	mov bx,ax
 	mov al,[aktualni_hra+bx]
 	cmp al,0
-	je konec_jedno_pole
+	jne nemenit_barvu
+	mov byte [cs:pozice+8],6
+nemenit_barvu:
+	push ax
+	mov ax,0x4
+	mov bx,pozice
+	int 0x22
+	pop ax
 	add al,0x40	
 	mov [znak], al
 	pop ax
@@ -114,10 +142,6 @@ nakresli_jedno_pole:
 	mov ax,0x1
 	mov cx,znak
 	int 0x22
-	popa
-	ret
-konec_jedno_pole:
-	pop ax
 	popa
 	ret
 nastav_pozice:
@@ -139,6 +163,7 @@ nastav_pozice:
 	add cx,26
 	mov [pozice+2],bx
 	mov [pozice+6],cx
+	mov byte [pozice+8],2
 	popa
 	ret
 pozice:
