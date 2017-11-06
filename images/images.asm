@@ -3,6 +3,7 @@ org 0
 %define SIRKA_OKNA 320
 ; nastavi video mod, bez parametru
 video_preruseni:
+	cli
 	push dx
 	push bx
 	mov bx,ax
@@ -18,6 +19,23 @@ tabulka_skoku:
 	dw text_nastavit_font
 	dw zobraz_hodiny
 	dw vypln_obdelnik
+	dw vypln_obrazovku
+vypln_obrazovku:
+	pusha
+	push ds
+	mov ax,cs
+	mov ds,ax
+	mov bx,obrazovka
+	call vypln_obdelnik
+	pop ds
+	popa
+	ret
+obrazovka:
+	dw 0
+	dw 300
+	dw 0
+	dw 200
+	db 0
 vypln_obdelnik:
 	pusha
 	push es
@@ -40,12 +58,6 @@ vypln_obdelnik:
 			push bx
 			mov dl,[ds:bx+8]
 			mov bx,ax
-			;push ax
-			;mov al,bh
-			;call pis16_registr
-			;mov al,bl
-			;call pis16_registr
-			;pop ax
 			mov [es:bx],dl
 			pop bx
 			pop dx

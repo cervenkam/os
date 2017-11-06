@@ -9,6 +9,8 @@ start:
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
+	mov ax,0x5
+	int 0x22
 	mov ax,0x2	
 	xor bx,bx
 	int 0x22
@@ -33,12 +35,12 @@ nakresli_vse:
 		jmp vnejsi_smycka
 	konec_vnejsi_smycky:
 stisk_klavesy:
-	;mov ax,0x02
-	;mov bx,0x1
-	;int 0x22
 	call najdi_pozici
 	xor ax,ax
 	int 0x16	
+	mov ax,0x02
+	mov bx,0x1
+	int 0x22
 	cmp ah,0x48
 	je sipka_nahoru
 	cmp ah,0x4B
@@ -187,7 +189,7 @@ nastav_pozice:
 	add cx,26
 	mov [pozice+2],bx
 	mov [pozice+6],cx
-	mov byte [pozice+8],2
+	mov byte [pozice+8],3
 	popa
 	ret
 pozice:
@@ -195,7 +197,7 @@ pozice:
 	dw 30
 	dw 0
 	dw 30
-	db 2
+	db 3
 znak:
 	db 'X',0
 cislo_hry:
