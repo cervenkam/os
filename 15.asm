@@ -50,6 +50,12 @@ konec:
 nakresli_jedno_pole:
 	pusha
 	push ax
+	call nastav_pozice
+	mov ax,0x4
+	mov bx,pozice
+	int 0x22
+	pop ax
+	push ax
 	mov bx,ax
 	shr bx,6
 	or al,bl		
@@ -59,6 +65,8 @@ nakresli_jedno_pole:
 	xor ah,ah
 	add bx,ax
 	mov al,[bx]
+	cmp al,0
+	je konec_jedno_pole
 	add al,0x40	
 	mov [znak], al
 	pop ax
@@ -71,23 +79,45 @@ nakresli_jedno_pole:
 	pop ax
 	mov al,ah
 	xor ah,ah
-	mov cx,320*24
+	mov cx,320*32
 	mul cx
 	add bx,ax
 	mov ax,0x1
 	mov cx,znak
 	int 0x22
-	mov ax,0x4
-	mov bx,pozice
-	int 0x22
+	popa
+	ret
+konec_jedno_pole:
+	pop ax
+	popa
+	ret
+nastav_pozice:
+	pusha
+	mov cx,ax
+	xor ch,ch
+	mov bx,ax
+	mov bl,bh
+	xor bh,bh
+	mov ax,0x30
+	mul cl
+	mov cx,ax
+	shl bx,5
+	add bx,8
+	add cx,76
+	mov [pozice],bx
+	mov [pozice+4],cx
+	add bx,26
+	add cx,26
+	mov [pozice+2],bx
+	mov [pozice+6],cx
 	popa
 	ret
 pozice:
-	dw 1
-	dw 5
+	dw 0
 	dw 30
-	dw 43
-	db 3
+	dw 0
+	dw 30
+	db 2
 znak:
 	db 'X',0
 cislo_hry:
