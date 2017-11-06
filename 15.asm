@@ -15,6 +15,7 @@ start:
 	mov ax,0x02
 	mov bx,0x1
 	int 0x22
+	call nacti_hru
 nakresli_vse:
 	mov ah,0
 	vnejsi_smycka:
@@ -47,6 +48,37 @@ sipka_vlevo:
 sipka_vpravo:
 konec:
 	jmp segment_jadro:0x0000
+nacti_hru:
+	pusha
+	xor bx,bx
+	mov cx,[cislo_hry]
+	shr cx,4
+	add cx,hry
+	smycka_najdi:
+		cmp bx,16
+		je konec_smycka_najdi
+		add bx,cx
+		mov al,[bx]
+		sub bx,cx
+		mov [cs:aktualni_hra+bx],al
+		inc bx
+		jmp smycka_najdi
+	konec_smycka_najdi:
+	popa
+	ret
+najdi_pozici:
+	push bx
+	xor bx,bx
+	smycka_pozice:
+		cmp bx,16
+		je konec_smycka_pozice
+		cmp byte [aktualni_hra+bx],0
+		je konec_smycka_pozice
+		inc bx
+		jmp smycka_pozice
+	konec_smycka_pozice:
+	pop bx
+	ret
 nakresli_jedno_pole:
 	pusha
 	push ax
@@ -59,12 +91,9 @@ nakresli_jedno_pole:
 	mov bx,ax
 	shr bx,6
 	or al,bl		
-	mov bx,[cislo_hry]
-	shr bx,4
-	add bx,hry
 	xor ah,ah
-	add bx,ax
-	mov al,[bx]
+	mov bx,ax
+	mov al,[aktualni_hra+bx]
 	cmp al,0
 	je konec_jedno_pole
 	add al,0x40	
@@ -127,5 +156,7 @@ hry:
 	db 5,6,7,8
 	db 9,10,11,12
 	db 13,14,0,15	
+aktualni_hra:
+	times 16 db 0
 %include "print.asm"
 times 0x400-($-$$) db 0
