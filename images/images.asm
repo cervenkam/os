@@ -159,7 +159,9 @@ text_zobraz_znak:
 	
 doom_pozice:
 ascii_small_pozice:
-	times 48 db 0
+	times 32 db 0
+	db 37
+	times 15 db 0
 	db 26,27,28,29,30,31,32,33,34,35 ; pozice cislic
 	db 36 ; pozice dvojtecky
 	times 6 db 0
@@ -176,13 +178,15 @@ doom_sirka:
 	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
 	times 5 db 0
 ascii_small_sirka:
-	times 48 db 0
+	times 32 db 0
+	db 5 ; sirka mezery
+	times 15 db 0
 	db 5,5,5,5,5,5,5,5,5,5                                 ; sirka cislic
 	db 1 ; sirka dvojtecky
 	times 6 db 0
-	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
+	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka znaky maly
 	times 6 db 0
-	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
+	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka znaky velky
 	times 5 db 0
 %include "print.asm"
 
@@ -249,7 +253,7 @@ zobraz_hodiny:
 	mov ax, cs
 	mov ds, ax
 	call ziskej_hodiny
-	xor bx,bx
+	mov bx,8
 	xor ah,ah
 	mov al,ch
 	call zobraz_registr
@@ -281,5 +285,5 @@ zobraz_registr:
 	pop ax
 	ret
 hodiny:
-	db "00:00:00",0
+	db "Hodiny: 00:00:00", 0
 times 0x2400-($-$$) db 0
