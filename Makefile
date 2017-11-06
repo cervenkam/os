@@ -1,7 +1,7 @@
 run: main.bin
 	find . -type f -name '*.bin' ! -name 'drive.bin' ! -name 'main.bin' -delete
 	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw
-main.bin: loader.bin kernel.bin filesystem.bin editor.bin browser.bin game.bin images.bin
+main.bin: loader.bin kernel.bin filesystem.bin editor.bin browser.bin 15.bin images.bin
 	cat $^ > $@
 kernel.bin: kernel.asm characters.asm disk.asm splash.asm print.asm
 	nasm -f bin kernel.asm -o $@
@@ -15,11 +15,7 @@ browser.bin: $(wildcard browser/*.asm) print.asm
 	nasm -f bin browser/browser.asm -o $@
 images.bin: $(wildcard images/*.asm) print.asm
 	nasm -f bin images/images.asm -o $@
-game.bin: game.asm
-	nasm -f bin game.asm -o $@
-timertest.bin: timertest.asm
-	nasm -f bin timertest.asm -o $@
-timertest: timertest.bin
-	qemu-system-x86_64 -drive file=timertest.bin,format=raw
+15.bin: 15.asm
+	nasm -f bin 15.asm -o $@
 clean:
 	find . -type f -name '*.bin' ! -name 'drive.bin' -delete
