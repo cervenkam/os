@@ -65,6 +65,8 @@ sipka_dolu:
 	mov ax,bx
 	add ax,4
 	call prehod_pole
+	cmp ax,0xf
+	je zkus_konec_hry
 	jmp stisk_klavesy
 sipka_vlevo:
 	test bx,0x3
@@ -81,6 +83,25 @@ sipka_vpravo:
 	mov ax,bx
 	inc ax
 	call prehod_pole
+	cmp ax,0xf
+	je zkus_konec_hry
+	jmp stisk_klavesy
+zkus_konec_hry:
+	pusha
+	xor bx,bx
+	smycka_konec_hry:
+		cmp bx,15
+		je konec_konec_hry
+		mov al,[cs:aktualni_hra+bx]
+		inc bx
+		cmp al,[cs:aktualni_hra+bx]
+		jge neni_konec_hry
+		jmp smycka_konec_hry
+	konec_konec_hry:
+	popa
+	jmp konec
+neni_konec_hry:
+	popa
 	jmp stisk_klavesy
 konec:
 	jmp segment_jadro:0x0000
@@ -127,7 +148,7 @@ najdi_pozici:
 	smycka_pozice:
 		cmp bx,16
 		je konec_smycka_pozice
-		cmp byte [cs:aktualni_hra+bx],0
+		cmp byte [cs:aktualni_hra+bx],15
 		je konec_smycka_pozice
 		inc bx
 		jmp smycka_pozice
@@ -143,7 +164,7 @@ nakresli_jedno_pole:
 	xor ah,ah
 	mov bx,ax
 	mov al,[cs:aktualni_hra+bx]
-	cmp al,0
+	cmp al,15
 	jne nemenit_barvu
 	mov byte [cs:pozice+8],6
 nemenit_barvu:
@@ -152,7 +173,9 @@ nemenit_barvu:
 	mov bx,pozice
 	int 0x22
 	pop ax
-	add al,0x40	
+	cmp al,15
+	je preskocit
+	add al,0x41	
 	mov [cs:znak], al
 	pop ax
 	mov bx,0x11d2
@@ -170,6 +193,10 @@ nemenit_barvu:
 	mov ax,0x1
 	mov cx,znak
 	int 0x22
+	popa
+	ret
+preskocit:
+	pop ax
 	popa
 	ret
 nastav_pozice:
@@ -205,10 +232,10 @@ znak:
 cislo_hry:
 	dw 0
 hry:
-	db 1,2,3,4
-	db 5,6,7,8
-	db 9,10,11,12
-	db 13,14,0,15	
+	db 0,1,2,3
+	db 4,5,6,7
+	db 8,9,10,11
+	db 12,13,15,14	
 aktualni_hra:
 	times 16 db 0
 %include "print.asm"

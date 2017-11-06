@@ -53,8 +53,8 @@ menu_smycka_konec:
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0
 	;0x08 test casovace
-	mov word [es:0x0020],interrupt
-	mov word [es:0x0022],cs
+	;mov word [es:0x0020],interrupt
+	;mov word [es:0x0022],cs
 	pop es
 	sti ;nastavit interrupty
 
