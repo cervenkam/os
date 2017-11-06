@@ -10,7 +10,7 @@
 %define segment_hra 0x5000
 %define velikost_hra 2
 %define segment_obrazky 0x9000
-%define velikost_obrazky 18
+%define velikost_obrazky 19
 ;nemenit nasledujici definice:
 %define start_jadro 2
 %define start_filesystem (start_jadro+velikost_jadro)

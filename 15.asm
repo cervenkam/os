@@ -77,8 +77,17 @@ nakresli_jedno_pole:
 	mov ax,0x1
 	mov cx,znak
 	int 0x22
+	mov ax,0x4
+	mov bx,pozice
+	int 0x22
 	popa
 	ret
+pozice:
+	dw 1
+	dw 5
+	dw 30
+	dw 43
+	db 3
 znak:
 	db 'X',0
 cislo_hry:

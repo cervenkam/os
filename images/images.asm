@@ -17,6 +17,47 @@ tabulka_skoku:
 	dw text_zobrazit
 	dw text_nastavit_font
 	dw zobraz_hodiny
+	dw vypln_obdelnik
+vypln_obdelnik:
+	pusha
+	push es
+	mov ax,0xa000
+	mov es,ax
+	mov cx,[ds:bx]
+	vnejsi_smycka:
+		cmp cx,[ds:bx+2]
+		je konec_vnejsi_smycky
+		mov dx,[ds:bx+4]
+		vnitrni_smycka:
+			cmp dx,[ds:bx+6]
+			je konec_vnitrni_smycky
+			mov ax,320
+			push dx
+			mul cx
+			pop dx
+			push dx
+			add ax,dx
+			push bx
+			mov dl,[ds:bx+8]
+			mov bx,ax
+			;push ax
+			;mov al,bh
+			;call pis16_registr
+			;mov al,bl
+			;call pis16_registr
+			;pop ax
+			mov [es:bx],dl
+			pop bx
+			pop dx
+			inc dx
+			jmp vnitrni_smycka
+		konec_vnitrni_smycky:
+		inc cx
+		jmp vnejsi_smycka
+	konec_vnejsi_smycky:
+	pop es
+	popa
+	ret
 text_nastavit_video_mod:
 	push ax
 	mov ax, 0x13    ; nastaveni video modu 320x200, 256barev
@@ -286,4 +327,4 @@ zobraz_registr:
 	ret
 hodiny:
 	db "Hodiny: 00:00:00", 0
-times 0x2400-($-$$) db 0
+times 0x2600-($-$$) db 0
