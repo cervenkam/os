@@ -152,8 +152,9 @@ konec:
 	jmp 0x1000:start
 interrupt:
 	cli
+	pusha
 	pushf
-	call 0xf000:0xfea5 ; MAGIC nemenit, jinak koncime ;)
+	call 0xf000:0xfea5
 	cmp byte [pocitadlo],0
 	jne pokracuj_interrupt
 	push ax
@@ -167,6 +168,7 @@ pokracuj_interrupt:
 	mov al,0x20
 	out 0x20,al
 	pop ax
+	popa
 	iret
 pocitadlo:
 	db 17

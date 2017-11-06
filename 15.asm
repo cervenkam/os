@@ -35,12 +35,14 @@ nakresli_vse:
 		jmp vnejsi_smycka
 	konec_vnejsi_smycky:
 stisk_klavesy:
-	call najdi_pozici
 	xor ax,ax
 	int 0x16	
+	push ax
 	mov ax,0x02
 	mov bx,0x1
 	int 0x22
+	pop ax
+	call najdi_pozici
 	cmp ah,0x48
 	je sipka_nahoru
 	cmp ah,0x4B
@@ -112,7 +114,7 @@ nacti_hru:
 		cmp bx,16
 		je konec_smycka_najdi
 		add bx,cx
-		mov al,[bx]
+		mov al,[cs:bx]
 		sub bx,cx
 		mov [cs:aktualni_hra+bx],al
 		inc bx
@@ -183,13 +185,13 @@ nastav_pozice:
 	shl bx,5
 	add bx,8
 	add cx,76
-	mov [pozice],bx
-	mov [pozice+4],cx
+	mov [cs:pozice],bx
+	mov [cs:pozice+4],cx
 	add bx,26
 	add cx,26
-	mov [pozice+2],bx
-	mov [pozice+6],cx
-	mov byte [pozice+8],3
+	mov [cs:pozice+2],bx
+	mov [cs:pozice+6],cx
+	mov byte [cs:pozice+8],3
 	popa
 	ret
 pozice:

@@ -32,7 +32,7 @@ vypln_obrazovku:
 	ret
 obrazovka:
 	dw 0
-	dw 300
+	dw 320
 	dw 0
 	dw 200
 	db 0
