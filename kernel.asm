@@ -127,10 +127,10 @@ tabulka_retezcu:
 	dw retezec_hra
 	dw retezec_neco
 tabulka_pozic:
-	dw 0x11e0
-	dw 0x3000
-	dw 0x47d0
-	dw 0x6940
+	dw 12*320+160-55-8
+	dw 12*3*320+160-35-8
+	dw 12*5*320+160-40-8
+	dw 12*7*320+160-34-8
 tabulka_segmentu:
 	dw segment_prohlizec
 	dw segment_editor
@@ -141,15 +141,15 @@ retezec_prohlizec:
 retezec_editor:
 	db "Editor",0
 retezec_hra:
-	db "Hra",0
+	db "Dasher",0
 retezec_neco:
-	db "Neco jineho",0
+	db "Snake",0
 konec:
 	jmp 0x1000:start
 interrupt:
 	cli
 	pushf
-	call 0xf000:0xfea5
+	call 0xf000:0xfea5 ; MAGIC nemenit, jinak koncime ;)
 	cmp byte [pocitadlo],0
 	jne pokracuj_interrupt
 	push ax

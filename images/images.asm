@@ -58,7 +58,7 @@ pismo_doom_svetlejsi:
 	dw doom ; adresa obrazku
 	dw doom_pozice ; pozice pismen v obrazku
 	dw doom_sirka ; sirka pismen v obrazku
-	db 4 ; pridani konstantni barvy
+	db 139 ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce
@@ -262,7 +262,7 @@ zobraz_hodiny:
 	mov al,dh
 	call zobraz_registr
 	mov cx,hodiny
-	mov bx,0xee0e
+	mov bx,0xee6e
 	mov word [aktivni_pismo],pismo_male
 	call text_zobrazit
 	pop ds
