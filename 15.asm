@@ -33,6 +33,18 @@ nakresli_vse:
 	konec_vnejsi_smycky:
 	xor ax,ax
 	int 0x16	
+	cmp ah,0x48
+	je sipka_nahoru
+	cmp ah,0x50
+	je sipka_dolu
+	cmp ah,0x4B
+	je sipka_vlevo
+	cmp ah,0x4D
+	je sipka_vpravo
+sipka_nahoru:
+sipka_dolu:
+sipka_vlevo:
+sipka_vpravo:
 konec:
 	jmp segment_jadro:0x0000
 nakresli_jedno_pole:
@@ -41,9 +53,14 @@ nakresli_jedno_pole:
 	mov bx,ax
 	shr bx,6
 	or al,bl		
+	mov bx,[cislo_hry]
+	shr bx,4
+	add bx,hry
 	xor ah,ah
-	add al,0x41	
-	mov byte [znak], al
+	add bx,ax
+	mov al,[bx]
+	add al,0x40	
+	mov [znak], al
 	pop ax
 	mov bx,0x11d2
 	mov cl,0x30
@@ -64,6 +81,8 @@ nakresli_jedno_pole:
 	ret
 znak:
 	db 'X',0
+cislo_hry:
+	dw 0
 hry:
 	db 1,2,3,4
 	db 5,6,7,8
