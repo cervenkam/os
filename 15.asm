@@ -32,18 +32,22 @@ nakresli_vse:
 		inc ah
 		jmp vnejsi_smycka
 	konec_vnejsi_smycky:
+stisk_klavesy:
+	;mov ax,0x02
+	;mov bx,0x1
+	;int 0x22
 	call najdi_pozici
 	xor ax,ax
-stisk_klavesy:
 	int 0x16	
 	cmp ah,0x48
 	je sipka_nahoru
-	cmp ah,0x50
-	je sipka_dolu
 	cmp ah,0x4B
 	je sipka_vlevo
 	cmp ah,0x4D
 	je sipka_vpravo
+	cmp ah,0x50
+	je sipka_dolu
+	jmp stisk_klavesy
 sipka_nahoru:
 	cmp bx,4
 	jl stisk_klavesy
@@ -52,8 +56,28 @@ sipka_nahoru:
 	call prehod_pole
 	jmp stisk_klavesy
 sipka_dolu:
+	cmp bx,12
+	jge stisk_klavesy
+	mov ax,bx
+	add ax,4
+	call prehod_pole
+	jmp stisk_klavesy
 sipka_vlevo:
+	test bx,0x3
+	jz stisk_klavesy
+	mov ax,bx
+	dec ax
+	call prehod_pole
+	jmp stisk_klavesy
 sipka_vpravo:
+	inc bx
+	test bx,0x3
+	jz stisk_klavesy
+	dec bx
+	mov ax,bx
+	inc ax
+	call prehod_pole
+	jmp stisk_klavesy
 konec:
 	jmp segment_jadro:0x0000
 prehod_pole:
@@ -79,7 +103,7 @@ prehod_pole:
 nacti_hru:
 	pusha
 	xor bx,bx
-	mov cx,[cislo_hry]
+	mov cx,[cs:cislo_hry]
 	shr cx,4
 	add cx,hry
 	smycka_najdi:
@@ -99,7 +123,7 @@ najdi_pozici:
 	smycka_pozice:
 		cmp bx,16
 		je konec_smycka_pozice
-		cmp byte [aktualni_hra+bx],0
+		cmp byte [cs:aktualni_hra+bx],0
 		je konec_smycka_pozice
 		inc bx
 		jmp smycka_pozice
@@ -114,7 +138,7 @@ nakresli_jedno_pole:
 	or al,bl		
 	xor ah,ah
 	mov bx,ax
-	mov al,[aktualni_hra+bx]
+	mov al,[cs:aktualni_hra+bx]
 	cmp al,0
 	jne nemenit_barvu
 	mov byte [cs:pozice+8],6
@@ -125,7 +149,7 @@ nemenit_barvu:
 	int 0x22
 	pop ax
 	add al,0x40	
-	mov [znak], al
+	mov [cs:znak], al
 	pop ax
 	mov bx,0x11d2
 	mov cl,0x30
