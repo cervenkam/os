@@ -28,12 +28,13 @@ start:
 
 	xor ax,ax
 	int 0x22
+	mov ax,0x02
+	xor bx,bx
+	int 0x22
 	mov ax,0x01
 	mov bx,0xed90
 	mov cx,verze
 	int 0x22
-	;mov ax,0x03
-	;int 0x22
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
@@ -131,7 +132,7 @@ tabulka_retezcu:
 tabulka_pozic:
 	dw 12*320+160-55-8
 	dw 12*3*320+160-35-8
-	dw 12*5*320+160-40-8
+	dw 12*5*320+160-20-8
 	dw 12*7*320+160-20-8
 tabulka_segmentu:
 	dw segment_prohlizec
@@ -143,11 +144,11 @@ retezec_prohlizec:
 retezec_editor:
 	db "Editor",0
 retezec_hra:
-	db "Dasher",0
+	db "15ka",0
 retezec_neco:
 	db "Info",0
 verze:
-	db "Verze OS: super", 0
+	db "Verze OS: 1.0.1", 0
 konec:
 	jmp 0x1000:start
 interrupt:

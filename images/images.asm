@@ -111,7 +111,7 @@ pismo_doom_svetlejsi:
 	dw doom ; adresa obrazku
 	dw doom_pozice ; pozice pismen v obrazku
 	dw doom_sirka ; sirka pismen v obrazku
-	db 1*16+11 ; pridani konstantni barvy
+	db 41 ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce
@@ -214,7 +214,9 @@ doom_pozice:
 ascii_small_pozice:
 	times 32 db 0
 	db 37
-	times 15 db 0
+	times 13 db 0
+	db 38 ; pozice tecky
+	db 0
 	db 26,27,28,29,30,31,32,33,34,35 ; pozice cislic
 	db 36 ; pozice dvojtecky
 	times 6 db 0
@@ -233,7 +235,9 @@ doom_sirka:
 ascii_small_sirka:
 	times 32 db 0
 	db 5 ; sirka mezery
-	times 15 db 0
+	times 13 db 0
+	db 1 ; sirka tecky
+	db 0
 	db 5,5,5,5,5,5,5,5,5,5                                 ; sirka cislic
 	db 1 ; sirka dvojtecky
 	times 6 db 0
