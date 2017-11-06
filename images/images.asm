@@ -161,7 +161,8 @@ doom_pozice:
 ascii_small_pozice:
 	times 48 db 0
 	db 26,27,28,29,30,31,32,33,34,35 ; pozice cislic
-	times 7 db 0
+	db 36 ; pozice dvojtecky
+	times 6 db 0
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku
 	times 6 db 0
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku
@@ -177,7 +178,8 @@ doom_sirka:
 ascii_small_sirka:
 	times 48 db 0
 	db 5,5,5,5,5,5,5,5,5,5                                 ; sirka cislic
-	times 7 db 0
+	db 1 ; sirka dvojtecky
+	times 6 db 0
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
 	times 6 db 0
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka cislic
