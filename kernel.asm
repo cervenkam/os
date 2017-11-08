@@ -10,6 +10,13 @@ start:
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
+po_logu:
+	mov ax, cs                ; zkopirovani code segmentu do AX
+	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
+	mov es, ax                ; a zkopirovani i do extra segmentu
+	mov ss, ax                ; a i do stack segmentu
+	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
+	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 	
 	xor dx,dx
 	; naveseni interruptu
@@ -23,6 +30,9 @@ start:
 	;0x21 sluzby souboroveho systemu
 	mov word [es:0x0084],0x0000
 	mov word [es:0x0086],segment_filesystem
+	;Ox1B break?
+	mov word [es:0x0014],break
+	mov word [es:0x0016],segment_jadro
 	pop es
 	sti ;nastavit interrupty
 
@@ -176,6 +186,19 @@ pokracuj_interrupt:
 	iret
 pocitadlo:
 	db 17
+
+break:
+	cli
+	pusha
+	pushf
+	call 0xf000:0xff54
+	popa
+	pop ax
+	pop ax
+	push cs
+	push po_logu
+	mov bp,sp
+        iret
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "print.asm"
