@@ -28,10 +28,11 @@ formatuj_disk:				; naformatuje disk AH = 37h
 	mov bx, boot_sektor		; nastaveni adresy odkud se bude zapisovat na disk
 	call zapis_sektoru_na_disk ; zapsani boot sektoru do prvniho sektoru
 
+	call vymaz_textovy_buffer  ; pro jistotu vymazeme textovy buffer
 	mov bx, textovy_buffer  ; nastaveni adresy na textovy_buffer, ktery budu zapisovat na disk
 	.cyklus:
 		inc cl				; inkrementuji cl
-		jo .konec_cyklu ; ukonci cyklus, pokud jsem pretekl
+		jo .konec_cyklu 	; ukonci cyklus, pokud jsem pretekl
 		call zapis_sektoru_na_disk
 		jmp .cyklus
 
@@ -39,16 +40,24 @@ formatuj_disk:				; naformatuje disk AH = 37h
 
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
-	mov ax,1
-	xor bx,bx
-	mov cx,textovy_buffer
-	int 0x22
 	ret
 smaz_slozku:				; procedura pro smazani slozky AH = 3Ah
 	ret
 nastav_slozku:				; procedura pro nastaveni aktualni slozky (cd) AH = 3Bh
-	mov di, dx
-	rep lodsb
+	mov si, dx
+	mov bx, 0
+	.cyklus:
+		lodsb
+		test al, al
+		jz .konec
+		mov byte [textovy_buffer+bx],al
+		inc bx
+
+		jmp .cyklus
+
+	.konec:
+	
+
 	ret
 novy_soubor:				; procedura pro vytvoreni noveho prazdneho souboru AH = 3Ch
 	ret
@@ -136,8 +145,7 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 	times 499 db 0						; doplneni na nuly
 
 textovy_buffer: ; univerzalni buffer pro odkladani dat
-	db "AHOJ"
-	times 508 db 0
+	times 512 db 0
 
 ; pomocna procedura pro vycisteni bufferu
 vymaz_textovy_buffer:
@@ -146,9 +154,9 @@ vymaz_textovy_buffer:
 	mov cx, 512
 	xor ax, ax
 	.vymazani:
-	mov bx,cx
-	mov byte [textovy_buffer+bx],0
-	loop .vymazani
+		mov bx,cx
+		mov byte [textovy_buffer+bx],0
+		loop .vymazani
 
 	popa
 

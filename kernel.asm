@@ -40,6 +40,11 @@ start:
 	mov bx,0x01
 	int 0x22
 
+	mov dx, tmp_retezec
+	mov ax, 0x3B ; nastaveni procedury formatovat disk
+	int 0x21	 ; preruseni pro vykonani formatovani disku
+	jmp $
+
 	mov ax,0x01
 menu_smycka:
 	cmp dx,8
@@ -176,6 +181,9 @@ pokracuj_interrupt:
 	iret
 pocitadlo:
 	db 17
+
+tmp_retezec:
+	db "temp",0
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 %include "print.asm"
