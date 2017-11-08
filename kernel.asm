@@ -26,8 +26,6 @@ start:
 	pop es
 	sti ;nastavit interrupty
 
-	mov ax, 0x37 ; nastaveni procedury formatovat disk
-	int 0x21	 ; preruseni pro vykonani formatovani disku
 
 	xor ax,ax
 	int 0x22
@@ -41,6 +39,8 @@ start:
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
+
+	mov ax,0x01
 menu_smycka:
 	cmp dx,8
 	je menu_smycka_konec

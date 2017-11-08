@@ -39,10 +39,16 @@ formatuj_disk:				; naformatuje disk AH = 37h
 
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
+	mov ax,1
+	xor bx,bx
+	mov cx,textovy_buffer
+	int 0x22
 	ret
 smaz_slozku:				; procedura pro smazani slozky AH = 3Ah
 	ret
 nastav_slozku:				; procedura pro nastaveni aktualni slozky (cd) AH = 3Bh
+	mov di, dx
+	rep lodsb
 	ret
 novy_soubor:				; procedura pro vytvoreni noveho prazdneho souboru AH = 3Ch
 	ret
@@ -130,8 +136,21 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 	times 499 db 0						; doplneni na nuly
 
 textovy_buffer: ; univerzalni buffer pro odkladani dat
-	times 512 db 0
+	db "AHOJ"
+	times 508 db 0
 
+; pomocna procedura pro vycisteni bufferu
+vymaz_textovy_buffer:
+	pusha
+
+	mov cx, 512
+	xor ax, ax
+	.vymazani:
+	mov bx,cx
+	mov byte [textovy_buffer+bx],0
+	loop .vymazani
+
+	popa
 
 ; DS:SI prvni porovnavany retezec
 ; ES:DI druhy porovnavany retezec
