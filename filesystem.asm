@@ -37,6 +37,22 @@ formatuj_disk:				; naformatuje disk AH = 37h
 
 	.konec_cyklu:
 
+	pusha
+	push ds
+	push es
+
+	mov ax, cs
+	mov ds, ax
+	mov es, ax
+	mov si, retezec_1
+	mov di, retezec_2
+	call pis16_registry
+	call porovnej_retezce
+	call pis16_registry
+
+	pop es
+	pop ds
+	popa
 
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
@@ -133,7 +149,39 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 prazdny_buffer:
 	times 512 db 0
 
+; DS:SI prvni porovnavany retezec
+; ES:DI druhy porovnavany retezec
+; vysledek se ulozi do al registru
+porovnej_retezce:
+	push si
+	push di
 
+	.cyklus:
+		lodsb 		; nacte ASCII hodnotu z DS:SI do al a inkrementuje SI
+		mov ah, [es:di] ; nacte ASCII hodnotu z ES:DI do ah
+		inc di		; inkrementuje di
+
+		xor al, ah
+		jnz .nejsou_stejny	; pokud al neni nulovy, tak nejsou testovane znaky stejny
+
+		test ah, ah ; otestuje registr al (neco jako al AND al)
+		jz .jsou_stejny
+
+		jmp .cyklus
+	.nejsou_stejny:
+		mov al, 1	; nastavime vysledek na 0 - nejsou stejny
+		jmp .konec
+	.jsou_stejny:
+		mov al, 0	; nastavime vysledek na 1 - jsou stejny
+	.konec:
+		pop di
+		pop si
+		ret
+
+retezec_1:
+	db "ahoj", 0
+retezec_2:
+	db "ahoj2", 0
 
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
