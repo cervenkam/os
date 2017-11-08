@@ -28,7 +28,7 @@ formatuj_disk:				; naformatuje disk AH = 37h
 	mov bx, boot_sektor		; nastaveni adresy odkud se bude zapisovat na disk
 	call zapis_sektoru_na_disk ; zapsani boot sektoru do prvniho sektoru
 
-	mov bx, prazdny_buffer  ; nastaveni adresy na prazdny_buffer, ktery budu zapisovat na disk
+	mov bx, textovy_buffer  ; nastaveni adresy na textovy_buffer, ktery budu zapisovat na disk
 	.cyklus:
 		inc cl				; inkrementuji cl
 		jo .konec_cyklu ; ukonci cyklus, pokud jsem pretekl
@@ -36,23 +36,6 @@ formatuj_disk:				; naformatuje disk AH = 37h
 		jmp .cyklus
 
 	.konec_cyklu:
-
-	pusha
-	push ds
-	push es
-
-	mov ax, cs
-	mov ds, ax
-	mov es, ax
-	mov si, retezec_1
-	mov di, retezec_2
-	call pis16_registry
-	call porovnej_retezce
-	call pis16_registry
-
-	pop es
-	pop ds
-	popa
 
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
@@ -146,8 +129,9 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 	db "FAT16   "						; identifikator souboroveho systemu
 	times 499 db 0						; doplneni na nuly
 
-prazdny_buffer:
+textovy_buffer: ; univerzalni buffer pro odkladani dat
 	times 512 db 0
+
 
 ; DS:SI prvni porovnavany retezec
 ; ES:DI druhy porovnavany retezec
@@ -177,11 +161,6 @@ porovnej_retezce:
 		pop di
 		pop si
 		ret
-
-retezec_1:
-	db "ahoj", 0
-retezec_2:
-	db "ahoj2", 0
 
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
