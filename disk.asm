@@ -1,5 +1,5 @@
 ; Zapise jeden sektor (512 bajtu) na disk
-; => CL Index sektoru na disku
+; => CX Index sektoru na disku
 ; => ES:BX Adresa, odkud se bude zapisovat na disk
 zapis_sektoru_na_disk:
 	pusha             ; ulozeni vsech registru na zasobnik
@@ -10,7 +10,7 @@ zapis_sektoru_na_disk:
 	popa              ; obnova registru ze zasobniku
 	ret               ; navrat z podprogramu
 ; Precte jeden sektor (512 bajtu) z disku
-; => CL Index sektoru na disku
+; => CX Index sektoru na disku
 ; => ES:BX Adresa, kam se bude zapisovat z disku
 cteni_sektoru_z_disku:
 	pusha             ; ulozeni vsech registru na zasobnik

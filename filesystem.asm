@@ -1,28 +1,43 @@
 org 0
 bits 16
-interrupt_handler:          ;
+
+interrupt_handler:
+	pusha
+	push es
+
+	mov dx, cs              ; zkopirovani code segmentu do AX
+	mov es, dx              ; a zkopirovani i do extra segmentu
+
 	sub ax,0x36				; odectu konstantu 0x36 abych jel od zacatku jump_table
+	mov bx,ax				; presunu hodnotu z ax do bx
+	shl bx,1				; hodnotu v registru bx vynasobim 2
+	mov dx,[cs:tabulka_skoku+bx] ; spocitam adresu skoku do jump_table
+	call dx					; skocim do obsluzne procedury
 
-	push bx
-	push dx
-	mov bx,ax
-	shl bx,1
-	mov dx,[cs:tabulka_skoku+bx]
-	call dx
-	pop dx
-	pop bx
-
+	pop es
+	popa
 	iret
 
-
-start:
-	mov ax, cs              ; zkopirovani code segmentu do AX
-	mov ds, ax              ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
-	mov es, ax              ; a zkopirovani i do extra segmentu
-	mov bp, 0x9000          ; nastaveni bazove adresy zasobniku
-	mov sp, bp              ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
+%include "disk.asm"
+%include "print.asm"
 
 velikost_disku:				; vypocet velikosti velikost_disku AH = 36h
+	ret
+formatuj_disk:				; naformatuje disk AH = 37h
+	mov cl, 1				; nastaveni indexu sektoru v disku
+	mov bx, boot_sektor		; nastaveni adresy odkud se bude zapisovat na disk
+	call zapis_sektoru_na_disk ; zapsani boot sektoru do prvniho sektoru
+
+	mov bx, prazdny_buffer  ; nastaveni adresy na prazdny_buffer, ktery budu zapisovat na disk
+	.cyklus:
+		inc cl				; inkrementuji cl
+		jo .konec_cyklu ; ukonci cyklus, pokud jsem pretekl
+		call zapis_sektoru_na_disk
+		jmp .cyklus
+
+	.konec_cyklu:
+
+
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
 	ret
@@ -57,15 +72,22 @@ ziskej_casovy_udaj_o_souboru:		; procedura pro ziskani casoveho udaje o souboru 
 nastav_casovy_udaj_o_souboru:		; procedura pro nastaveni casoveho udaje o souboru AH = 57h
 	ret
 pomocna_atributy_souboru:			; pomocna procedura pro obsluhuprace s atributem souboru
-	ret
+	cmp al, 0
+	je pokracuj_dal
+	call nastav_atributy_souboru
+	jmp konec_1
+	pokracuj_dal:
+		call ziskej_atributy_souboru
+	konec_1:
+		ret
 pomocna_casovy_udaj_o_souboru:		; pomocna procedura pro obsluhu prace s casovym udajem o souboru
 	ret
 konec:
-	jmp 0x1000:start
+	jmp 0x1000:0x0000
 
 tabulka_skoku:
 	dw velikost_disku					; 36h
-	dw 0								; 37h
+	dw formatuj_disk					; 37h
 	dw 0								; 38h
 	dw nova_slozka						; 39h
  	dw smaz_slozku						; 3Ah
@@ -86,9 +108,33 @@ tabulka_skoku:
  	dw prejmenuj_soubor					; 56h
  	dw pomocna_casovy_udaj_o_souboru	; 57h
 
+boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
+	times 3 db 0						; program
+	db "FailOSas"						; nazev spolecnosti
+	dw 512								; pocet bytu na blok
+	db 16								; pocet bloku na alokacni jednotku
+	dw 1								; pocet rezervovanych bloku
+	db 1								; pocet fat tabulek
+	dw 1								; pocet korenovych slozek
+	dw 0xFFFF							; celkovy pocet bloku (nepocitam s tim)
+	db 0xF0								; typ media (neznamy parametr)
+	dw 32								; pocet bloku na fat tabulku
+	dw 0xFFFF							; pocet bloku na stopu (neznamy parametr)
+	dw 0xFFFF							; pocet ploch disku (neznamy parametr)
+	dd 0								; pocet skrytych bloku
+	dd 0xFFFFFFFF						; celkovy pocet bloku
+	dw 0								; cislo fyzicke jednotky
+	db 0								; EBRS (neznamy parametr)
+	dd 0xFACEB00C						; seriove cislo jednotky
+	db "FailOS fs  "					; popisek jednotky
+	db "FAT16   "						; identifikator souboroveho systemu
+	times 499 db 0						; doplneni na nuly
+
+prazdny_buffer:
+	times 512 db 0
 
 
 
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
-times 0x200-($-$$) db 0
+times 0x800-($-$$) db 0

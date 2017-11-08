@@ -26,6 +26,9 @@ start:
 	pop es
 	sti ;nastavit interrupty
 
+	mov ax, 0x37 ; nastaveni procedury formatovat disk
+	int 0x21	 ; preruseni pro vykonani formatovani disku
+
 	xor ax,ax
 	int 0x22
 	mov ax,0x02
@@ -54,8 +57,8 @@ menu_smycka_konec:
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0
 	;0x08 test casovace
-	;mov word [es:0x0020],interrupt
-	;mov word [es:0x0022],cs
+	mov word [es:0x0020],interrupt
+	mov word [es:0x0022],cs
 	pop es
 	sti ;nastavit interrupty
 
