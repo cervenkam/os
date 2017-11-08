@@ -5,9 +5,6 @@ start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
 	mov es, ax                ; a zkopirovani i do extra segmentu
-	mov ss, ax                ; a i do stack segmentu
-	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
-	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
 	mov ax,0x5
 	int 0x22
