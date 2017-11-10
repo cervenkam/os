@@ -1,12 +1,12 @@
 ; 1. soubor = failos.txt
-db "failos",0,0	; nazev souboru (max 8b)
+db "failos  "	; nazev souboru (max 8b)
 db "txt"		; pripona (3b)
 db 0			; atributy souboru (1b)
-times 10 db 0	; rezervovano (10b)
+times 10 db 0xab	; rezervovano (10b)
 dw 0			; cas vytvoreni, nebo posledniho updatu (2b)
 dw 0			; datum vytvoreni, nebo posledniho updatu (2b)
 dw 2			; cislo prvniho clusteru s obsahem souboru
-dd 0			; vleikost souboru
+db 0,0,0,0			; vleikost souboru
 
 ; 2. soubor = w10sucks.txt
 db "w10sucks"
@@ -16,7 +16,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 3
-dd 0
+db 0,0,0,0x80
 
 ; 3. soubor = linus.txt
 db "linux   "
@@ -26,7 +26,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 4
-dd 0
+db 0,0,0,0xc0
 
 ; 4. soubor = epicfile.txt
 db "epicfile"
@@ -36,7 +36,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 5
-dd 0
+db 0,0,1,0x40
 
 ; 5. soubor = doom.txt
 db "doom    "
@@ -46,7 +46,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 6
-dd 0
+db 0,0,1,0xa0
 
 ; 6. soubor = i386<3.txt
 db "i386<3  "
@@ -56,7 +56,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 7
-dd 0
+db 0,0,1,0xc0
 
 ; 7. soubor = asm4ever.txt
 db "asm4ever"
@@ -66,7 +66,7 @@ times 10 db 0
 dw 0
 dw 0
 dw 8
-dd 0
+db 0,0,3,0
 
 ; 8. soubor = slack.txt
 db "slack   "
@@ -156,4 +156,4 @@ times 10 db 0
 dw 0
 dw 0
 dw 17
-dd 0
+db 0,0,0,0xff

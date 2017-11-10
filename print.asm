@@ -10,6 +10,7 @@ pis16_smycka:
 	lodsb             ; nacteni znaku z adresy DS:SI do registru AL
 	cmp al, 0         ; porovnani na konec retezce
 	je pis16_konec    ; ukonceni v pripade konce retezce
+	mov bl,0xf
 	int 0x10          ; volani video sluby BIOSu
 	jmp pis16_smycka  ; opetovne volani, dokud neni konec retezce
 pis16_konec:
@@ -21,13 +22,14 @@ pis16_konec:
 ; => AL - obsah registru
 pis16_registr:
 	pusha                                 ; ulozeni vsech registru do zasobniku
+	mov bl,0xf
 	mov si, ax                            ; nastaveni registru SI na hodnotu znaku ulozenou v AX
 	mov ah, 0x0e                          ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
-	mov bl, al                            ; zaloha registru AL do BL
+	mov cl, al                            ; zaloha registru AL do CL
 	shr al, 4                             ; deleni 16ti
 	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
 	int 0x10                              ; volani video sluby BIOSu
-	mov al, bl                            ; obnova registru AL z BL
+	mov al, cl                            ; obnova registru AL z CL
 	and al,0xf
 	call pis16_registr_preved_znak        ; volani vypisu jednoho znaku
 	int 0x10                              ; volani video sluby BIOSu

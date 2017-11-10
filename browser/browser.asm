@@ -41,17 +41,17 @@ stisk_klavesy:
 	je enter
 	jmp stisk_klavesy
 sipka_do_strany:
-	xor byte [aktualni_soubor],1
+	xor byte [cs:aktualni_soubor],1
 	jmp start
 sipka_dolu:
-	add byte [aktualni_soubor],2
-	xor byte [aktualni_soubor],1
-	and byte [aktualni_soubor],15
+	add byte [cs:aktualni_soubor],2
+	xor byte [cs:aktualni_soubor],1
+	and byte [cs:aktualni_soubor],15
 	jmp start
 sipka_nahoru:
-	sub byte [aktualni_soubor],2
-	xor byte [aktualni_soubor],1
-	and byte [aktualni_soubor],15
+	sub byte [cs:aktualni_soubor],2
+	xor byte [cs:aktualni_soubor],1
+	and byte [cs:aktualni_soubor],15
 	jmp start
 enter:
 	; TODO otevrit editor
@@ -88,13 +88,16 @@ nemenit_pozadi:
 	mov bx,pozice
 	int 0x22	
 	pop bx
+	pop dx
 	pop ax
 	push ax
+	push dx
 	; kresleni obliceje	
 	mov byte [cs:znak],2
 	push bx
 	mov bx,ax
-	mov ax,[cs:nacteny_buffer+bx+0x1e]
+	mov ah,[cs:nacteny_buffer+bx+0x1e]
+	mov al,[cs:nacteny_buffer+bx+0x1f]
 	mov cx,102
 	xor dx,dx
 	div cx
