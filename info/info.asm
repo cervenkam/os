@@ -22,7 +22,7 @@ start:
 	xor ax,ax
 	int 0x16
 konec:
-	jmp 0x1000:start
+	int 0x05
 retezec_jmeno_1:
 	db "Martin Cervenka",0
 retezec_jmeno_2:

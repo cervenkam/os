@@ -168,7 +168,7 @@ retezec_neco:
 verze:
 	db "Verze OS: 1.0.1", 0
 konec:
-	jmp 0x1000:start
+	int 0x05
 interrupt:
 	cli
 	pusha

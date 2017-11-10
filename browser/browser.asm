@@ -27,7 +27,7 @@ start:
 	konec_cyklu:
 	jmp $
 konec:
-	jmp segment_jadro:0x0000
+	int 0x05
 
 ; AX => pozice souboru
 ; BX => pozice, kam se ma kreslit

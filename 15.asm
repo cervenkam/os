@@ -101,7 +101,7 @@ neni_konec_hry:
 	popa
 	jmp stisk_klavesy
 konec:
-	jmp segment_jadro:0x0000
+	int 0x05
 prehod_pole:
 	pusha
 	mov cl,[cs:aktualni_hra+bx]
