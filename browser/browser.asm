@@ -3,7 +3,11 @@ bits 16
 %include "consts.asm"
 
 start:
+	mov ax,cs
+	mov ds,ax
+
 	mov bx,660
+	xor ax,ax
 	call kresli_jeden_soubor
 	jmp $
 konec:
@@ -18,51 +22,37 @@ kresli_jeden_soubor:
 	mov ax,bx
 	mov cx,320
 	div cx
-	mov [pozice],ax
-	mov [pozice+2],dx
-	add ax,20
-	add dx,100
-	mov [pozice+4],ax
-	mov [pozice+6],dx
+	mov [cs:pozice],ax
+	mov [cs:pozice+4],dx
+	add ax,40
+	add dx,120
+	mov [cs:pozice+2],ax
+	mov [cs:pozice+6],dx
 	;kresleni pozadi
 	mov ax,0x4
 	mov bx,pozice
 	int 0x22	
 	pop ax
 	; kresleni face	
-	mov byte [znak],1
+	mov byte [cs:znak],2
 	push bx
 	mov bx,ax
-	mov cx,[bx+0x1e]
-	cmp cx,410
-	jge procent100
-	cmp cx,307
-	jge procent80
-	cmp cx,205
-	jge procent60
-	cmp cx,102
-	jge procent40
-	test cx,cx
-	jnz procent20
-	jmp procent0
-procent100:
-	inc byte [znak]
-procent80:
-	inc byte [znak]
-procent60:
-	inc byte [znak]
-procent40:
-	inc byte [znak]
-procent20:
-	inc byte [znak]
-procent0:
+	mov ax,[cs:nacteny_buffer+bx+0x1e]
+	mov cx,102
+	xor dx,dx
+	div cx
+	cmp al,5
+	jle neopravuj_al
+	mov al,5
+neopravuj_al:
+	add [cs:znak],al
 	mov ax,0x2
 	mov bx,0x3
 	int 0x22
 	pop bx
 	push bx
 	mov ax,0x1
-	add bx,0x1000
+	add bx,0x4a0
 	mov cx,znak
 	int 0x22
 	pop bx
@@ -77,7 +67,7 @@ pozice:
 znak:
 	dw 0
 nacteny_buffer:
-	times 0x200 db 0
+	times 0x100 db 0xff,0x0
 
 %include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale

@@ -115,7 +115,7 @@ pismo_doom_svetlejsi:
 pismo_doomfaces:
 	db 31 ; vyska znaku
 	db 24 ; sirka obrazku
-	db 0x0 ; transparentni barva
+	db 11 ; transparentni barva
 	dw doomfaces_font ; adresa obrazku
 	dw doomfaces_pozice ; pozice pismen v obrazku
 	dw doomfaces_sirka ; sirka pismen v obrazku
