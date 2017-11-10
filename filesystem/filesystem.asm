@@ -1,6 +1,6 @@
 %define POCET_BYTU_NA_BLOK 512
 %define MAX_POCET_SOUBORU 16
-%define KONEC_SOUBORU 1
+%define KONEC_SOUBORU 0xFFFF
 org 0
 bits 16
 
@@ -209,8 +209,8 @@ textovy_buffer: ; univerzalni buffer pro odkladani dat
 fatka:
 	db 0xF0	; prvni dva bajty jsou magicke konstanty
 	db 0xFF
-	times MAX_POCET_SOUBORU db KONEC_SOUBORU
-	times 494 db 0
+	times MAX_POCET_SOUBORU dw KONEC_SOUBORU
+	times 478 db 0
 
 definice_souboru:
 	%include "filesystem/files.asm"
