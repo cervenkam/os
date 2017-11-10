@@ -30,9 +30,16 @@ formatuj_disk:				; naformatuje disk AH = 37h
 	mov bx, boot_sektor		; nastaveni adresy odkud se bude zapisovat na disk
 	call zapis_sektoru_na_disk ; zapsani boot sektoru do prvniho sektoru
 
+	;TODO dodelat obsah fatky
+	mov cl, 2
+	mov bx, textovy_buffer
+	call zapis_sektoru_na_disk
 	times POCET_BYTU_NA_BLOK db 0 ; zapsani do FATky
 
-	%include "filesystem/files.asm"
+	; zapise obsah root directory na disk
+	mov cl, 3
+	mov bx, definice_souboru
+	call zapis_sektoru_na_disk
 
 
 	; call vymaz_textovy_buffer  ; pro jistotu vymazeme textovy buffer
@@ -105,6 +112,51 @@ pomocna_casovy_udaj_o_souboru:		; pomocna procedura pro obsluhu prace s casovym 
 konec:
 	jmp 0x1000:0x0000
 
+; pomocna procedura pro vycisteni bufferu
+vymaz_textovy_buffer:
+	pusha
+
+	mov cx, 512
+	xor ax, ax
+	.vymazani:
+		mov bx,cx
+		mov byte [textovy_buffer+bx],0
+		loop .vymazani
+
+	popa
+
+; DS:SI prvni porovnavany retezec
+; ES:DI druhy porovnavany retezec
+; vysledek se ulozi do al registru
+porovnej_retezce:
+	push si
+	push di
+
+	.cyklus:
+		lodsb 		; nacte ASCII hodnotu z DS:SI do al a inkrementuje SI
+		mov ah, [es:di] ; nacte ASCII hodnotu z ES:DI do ah
+		inc di		; inkrementuje di
+
+		xor al, ah
+		jnz .nejsou_stejny	; pokud al neni nulovy, tak nejsou testovane znaky stejny
+
+		test ah, ah ; otestuje registr al (neco jako al AND al)
+		jz .jsou_stejny
+
+		jmp .cyklus
+	.nejsou_stejny:
+		mov al, 1	; nastavime vysledek na 0 - nejsou stejny
+		jmp .konec
+	.jsou_stejny:
+		mov al, 0	; nastavime vysledek na 1 - jsou stejny
+	.konec:
+		pop di
+		pop si
+		ret
+
+; datova cast
+;=================================================
+
 tabulka_skoku:
 	dw velikost_disku					; 36h
 	dw formatuj_disk					; 37h
@@ -153,47 +205,8 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 textovy_buffer: ; univerzalni buffer pro odkladani dat
 	times 512 db 0
 
-; pomocna procedura pro vycisteni bufferu
-vymaz_textovy_buffer:
-	pusha
-
-	mov cx, 512
-	xor ax, ax
-	.vymazani:
-		mov bx,cx
-		mov byte [textovy_buffer+bx],0
-		loop .vymazani
-
-	popa
-
-; DS:SI prvni porovnavany retezec
-; ES:DI druhy porovnavany retezec
-; vysledek se ulozi do al registru
-porovnej_retezce:
-	push si
-	push di
-
-	.cyklus:
-		lodsb 		; nacte ASCII hodnotu z DS:SI do al a inkrementuje SI
-		mov ah, [es:di] ; nacte ASCII hodnotu z ES:DI do ah
-		inc di		; inkrementuje di
-
-		xor al, ah
-		jnz .nejsou_stejny	; pokud al neni nulovy, tak nejsou testovane znaky stejny
-
-		test ah, ah ; otestuje registr al (neco jako al AND al)
-		jz .jsou_stejny
-
-		jmp .cyklus
-	.nejsou_stejny:
-		mov al, 1	; nastavime vysledek na 0 - nejsou stejny
-		jmp .konec
-	.jsou_stejny:
-		mov al, 0	; nastavime vysledek na 1 - jsou stejny
-	.konec:
-		pop di
-		pop si
-		ret
+definice_souboru:
+	%include "filesystem/files.asm"
 
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
