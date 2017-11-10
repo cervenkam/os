@@ -6,9 +6,25 @@ start:
 	mov ax,cs
 	mov ds,ax
 
+	mov ax,5
+	int 0x22
+	mov cx,8
 	mov bx,660
 	xor ax,ax
-	call kresli_jeden_soubor
+	xor dx,dx
+	cyklus:
+		test cx,cx
+		jz konec_cyklu
+		call kresli_jeden_soubor
+		add ax,0x20
+		add bx,160
+		call kresli_jeden_soubor
+		add ax,0x20
+		add bx,8000
+		dec cx
+		xor dh,1
+		jmp cyklus
+	konec_cyklu:
 	jmp $
 konec:
 	jmp segment_jadro:0x0000
@@ -18,20 +34,23 @@ konec:
 kresli_jeden_soubor:
 	pusha
 	push ax
+	push dx
 	;nastaveni pozadi
 	mov ax,bx
 	mov cx,320
 	div cx
 	mov [cs:pozice],ax
 	mov [cs:pozice+4],dx
-	add ax,40
+	add ax,17
 	add dx,120
 	mov [cs:pozice+2],ax
 	mov [cs:pozice+6],dx
 	;kresleni pozadi
 	mov ax,0x4
+	push bx
 	mov bx,pozice
 	int 0x22	
+	pop bx
 	pop ax
 	push ax
 	; kresleni obliceje	
@@ -51,9 +70,14 @@ neopravuj_al:
 	mov bx,0x3
 	int 0x22
 	pop bx
+	pop dx
 	push bx
 	mov ax,0x1
-	add bx,0x6c9
+	sub bx,320*6
+	test dh,dh
+	jz nepridavat
+	add bx,96
+nepridavat:
 	mov cx,znak
 	int 0x22
 	; kresleni jmena
@@ -72,7 +96,11 @@ neopravuj_al:
 	mov bx,ax
 	pop bx
 	push bx
-	add bx,0x6f0
+	add bx,320*2+2
+	test dh,dh
+	jnz nepridavat_2
+	add bx,60
+nepridavat_2:
 	mov ax,0x1
 	int 0x22
 	mov bx,cx
@@ -90,7 +118,11 @@ neopravuj_al:
 	mov bx,ax
 	pop bx
 	push bx
-	add bx,0x720
+	add bx,320*9+2
+	test dh,dh
+	jnz nepridavat_3
+	add bx,60
+nepridavat_3:
 	mov ax,0x1
 	int 0x22
 	mov bx,cx
