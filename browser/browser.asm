@@ -33,7 +33,8 @@ kresli_jeden_soubor:
 	mov bx,pozice
 	int 0x22	
 	pop ax
-	; kresleni face	
+	push ax
+	; kresleni obliceje	
 	mov byte [cs:znak],2
 	push bx
 	mov bx,ax
@@ -52,10 +53,29 @@ neopravuj_al:
 	pop bx
 	push bx
 	mov ax,0x1
-	add bx,0x4a0
+	add bx,0x480
 	mov cx,znak
 	int 0x22
+	; kresleni jmena
+	mov ax,0x2
+	mov bx,0x4
+	int 0x22
 	pop bx
+	pop ax
+	push ax
+	push bx
+	mov bx,ax
+	add bx,nacteny_buffer
+	mov dl,[cs:bx+8]
+	mov byte [cs:bx+8],0
+	mov cx,bx
+	mov bx,ax
+	add bx,0x400
+	mov ax,0x1
+	int 0x22
+	mov [cs:bx+8],dl
+	pop bx
+	pop ax
 	popa
 	ret	
 pozice:
@@ -67,7 +87,8 @@ pozice:
 znak:
 	dw 0
 nacteny_buffer:
-	times 0x100 db 0xff,0x0
+	%include "filesystem/files.asm"
+	;times 0x100 db 0xff,0x0
 
 %include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
