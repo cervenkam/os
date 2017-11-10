@@ -53,7 +53,6 @@ po_logu:
 	mov dx, tmp_retezec
 	mov ax, 0x3B ; nastaveni procedury formatovat disk
 	int 0x21	 ; preruseni pro vykonani formatovani disku
-	jmp $
 
 	mov ax,0x01
 menu_smycka:

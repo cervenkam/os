@@ -7,8 +7,8 @@ kernel.bin: kernel.asm characters.asm disk.asm splash.asm print.asm
 	nasm -f bin kernel.asm -o $@
 loader.bin: loader.asm print.asm
 	nasm -f bin loader.asm -o $@
-filesystem.bin: filesystem.asm
-	nasm -f bin filesystem.asm -o $@
+filesystem.bin: $(wildcard filesystem/*.asm)
+	nasm -f bin filesystem/filesystem.asm -o $@
 editor.bin: editor.asm
 	nasm -f bin editor.asm -o $@
 browser.bin: $(wildcard browser/*.asm) print.asm
