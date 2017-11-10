@@ -51,7 +51,7 @@ po_logu:
 	int 0x22
 
 	mov dx, tmp_retezec
-	mov ax, 0x3B ; nastaveni procedury formatovat disk
+	mov ax, 0x37 ; nastaveni procedury formatovat disk
 	int 0x21	 ; preruseni pro vykonani formatovani disku
 
 	mov ax,0x01

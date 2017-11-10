@@ -39,7 +39,7 @@ dw 5
 dd 0
 
 ; 5. soubor = doom.txt
-db "doom   "
+db "doom    "
 db "txt"
 db 0
 times 10 db 0
