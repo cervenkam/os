@@ -24,6 +24,11 @@ nacteni_sektoru:
 	mov bx,segment_jadro      ; informace o segmentu jadra
 	call nacti_segmenty       ; nacteni sektoru do pameti
 	jc restart
+	; cteni jednotlivych sektoru
+	mov ax,info               ; informace o sektorech informacni obrazovky
+	mov bx,segment_info       ; informace o segmentu informacni obrazovky
+	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart
 	mov ax,filesystem         ; informace o sektorech filesystemu
 	mov bx,segment_filesystem ; informace o segmentu filesystemu
 	call nacti_segmenty       ; nacteni sektoru do pameti
