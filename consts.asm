@@ -6,11 +6,11 @@
 %define segment_editor 0x3000
 %define velikost_editor 1
 %define segment_prohlizec 0x4000
-%define velikost_prohlizec 1
+%define velikost_prohlizec 2
 %define segment_hra 0x5000
 %define velikost_hra 2
 %define segment_obrazky 0x9000
-%define velikost_obrazky 19
+%define velikost_obrazky 29
 ;nemenit nasledujici definice:
 %define start_jadro 2
 %define start_filesystem (start_jadro+velikost_jadro)

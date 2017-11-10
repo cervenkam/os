@@ -55,6 +55,7 @@ po_logu:
 	int 0x21	 ; preruseni pro vykonani formatovani disku
 
 	mov ax,0x01
+	xor dx,dx
 menu_smycka:
 	cmp dx,8
 	je menu_smycka_konec

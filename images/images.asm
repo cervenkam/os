@@ -112,6 +112,14 @@ pismo_doom_svetlejsi:
 	dw doom_pozice ; pozice pismen v obrazku
 	dw doom_sirka ; sirka pismen v obrazku
 	db 41 ; pridani konstantni barvy
+pismo_doomfaces:
+	db 31 ; vyska znaku
+	db 24 ; sirka obrazku
+	db 0x0 ; transparentni barva
+	dw doomfaces_font ; adresa obrazku
+	dw doomfaces_pozice ; pozice pismen v obrazku
+	dw doomfaces_sirka ; sirka pismen v obrazku
+	db 0 ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce
@@ -207,6 +215,7 @@ text_zobraz_znak:
 	text_konec_vnejsi_cyklus:
 	popa
 	ret
+%include "images/doomfaces_font.asm"
 %include "images/ascii_small.asm"
 %include "images/doom.asm"
 	
@@ -245,6 +254,14 @@ ascii_small_sirka:
 	times 6 db 0
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka znaky velky
 	times 5 db 0
+doomfaces_sirka:
+	dw 0
+	times 6 db 24
+	times 250 db 0
+doomfaces_pozice:
+	dw 0
+	db 0,1,2,3,4,5
+	times 250 db 0
 %include "print.asm"
 
 ; ziska cas z BIOSu
@@ -343,4 +360,4 @@ zobraz_registr:
 	ret
 hodiny:
 	db "Hodiny: 00:00:00", 0
-times 0x2600-($-$$) db 0
+times 0x3a00-($-$$) db 0
