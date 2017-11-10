@@ -53,7 +53,7 @@ neopravuj_al:
 	pop bx
 	push bx
 	mov ax,0x1
-	add bx,0x480
+	add bx,0x6c9
 	mov cx,znak
 	int 0x22
 	; kresleni jmena
@@ -70,10 +70,31 @@ neopravuj_al:
 	mov byte [cs:bx+8],0
 	mov cx,bx
 	mov bx,ax
-	add bx,0x400
+	pop bx
+	push bx
+	add bx,0x6f0
 	mov ax,0x1
 	int 0x22
+	mov bx,cx
 	mov [cs:bx+8],dl
+	pop bx
+	pop ax
+	push ax
+	push bx
+	mov bx,ax
+	add bx,nacteny_buffer
+	add bx,8
+	mov dl,[cs:bx+3]
+	mov byte [cs:bx+3],0
+	mov cx,bx
+	mov bx,ax
+	pop bx
+	push bx
+	add bx,0x720
+	mov ax,0x1
+	int 0x22
+	mov bx,cx
+	mov [cs:bx+3],dl
 	pop bx
 	pop ax
 	popa
@@ -93,4 +114,4 @@ nacteny_buffer:
 %include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
-times 0x400-($-$$) db 0
+times 0x600-($-$$) db 0

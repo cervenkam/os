@@ -6,7 +6,7 @@
 %define segment_editor 0x3000
 %define velikost_editor 1
 %define segment_prohlizec 0x4000
-%define velikost_prohlizec 2
+%define velikost_prohlizec 3
 %define segment_hra 0x5000
 %define velikost_hra 2
 %define segment_obrazky 0x9000
