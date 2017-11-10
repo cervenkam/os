@@ -8,24 +8,54 @@ start:
 
 	mov ax,5
 	int 0x22
-	mov cx,8
-	mov bx,660
+	xor cx,cx
+	mov bx,660+960+640
 	xor ax,ax
 	xor dx,dx
 	cyklus:
-		test cx,cx
-		jz konec_cyklu
+		cmp cx,16
+		jge konec_cyklu
 		call kresli_jeden_soubor
 		add ax,0x20
 		add bx,160
+		inc cx
 		call kresli_jeden_soubor
 		add ax,0x20
-		add bx,8000
-		dec cx
+		add bx,8000-960
+		inc cx
 		xor dh,1
 		jmp cyklus
 	konec_cyklu:
-	jmp $
+stisk_klavesy:
+	xor ax,ax
+	int 0x16	
+	cmp ah,0x48
+	je sipka_nahoru
+	cmp ah,0x4B
+	je sipka_do_strany
+	cmp ah,0x4D
+	je sipka_do_strany
+	cmp ah,0x50
+	je sipka_dolu
+	cmp ah,0x1C ;enter
+	je enter
+	jmp stisk_klavesy
+sipka_do_strany:
+	xor byte [aktualni_soubor],1
+	jmp start
+sipka_dolu:
+	add byte [aktualni_soubor],2
+	xor byte [aktualni_soubor],1
+	and byte [aktualni_soubor],15
+	jmp start
+sipka_nahoru:
+	sub byte [aktualni_soubor],2
+	xor byte [aktualni_soubor],1
+	and byte [aktualni_soubor],15
+	jmp start
+enter:
+	; TODO otevrit editor
+	jmp start
 konec:
 	int 0x05
 
@@ -35,6 +65,7 @@ kresli_jeden_soubor:
 	pusha
 	push ax
 	push dx
+	push cx
 	;nastaveni pozadi
 	mov ax,bx
 	mov cx,320
@@ -45,6 +76,12 @@ kresli_jeden_soubor:
 	add dx,120
 	mov [cs:pozice+2],ax
 	mov [cs:pozice+6],dx
+	mov byte [cs:pozice+8],4
+	pop cx
+	cmp cl,[aktualni_soubor]
+	jne nemenit_pozadi
+	mov byte [cs:pozice+8],5
+nemenit_pozadi:
 	;kresleni pozadi
 	mov ax,0x4
 	push bx
@@ -139,6 +176,8 @@ pozice:
 	db 4
 znak:
 	dw 0
+aktualni_soubor:
+	db 0
 nacteny_buffer:
 	%include "filesystem/files.asm"
 	;times 0x100 db 0xff,0x0
