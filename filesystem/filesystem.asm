@@ -1,5 +1,6 @@
 %define POCET_BYTU_NA_BLOK 512
 %define MAX_POCET_SOUBORU 16
+%define KONEC_SOUBORU 1
 org 0
 bits 16
 
@@ -26,15 +27,15 @@ interrupt_handler:
 velikost_disku:				; vypocet velikosti velikost_disku AH = 36h
 	ret
 formatuj_disk:				; naformatuje disk AH = 37h
+	; zapise boot sektor na disk
 	mov cl, 1				; nastaveni indexu sektoru v disku
 	mov bx, boot_sektor		; nastaveni adresy odkud se bude zapisovat na disk
 	call zapis_sektoru_na_disk ; zapsani boot sektoru do prvniho sektoru
 
-	;TODO dodelat obsah fatky
+	; zapise obsah FATky na disk
 	mov cl, 2
-	mov bx, textovy_buffer
+	mov bx, fatka
 	call zapis_sektoru_na_disk
-	times POCET_BYTU_NA_BLOK db 0 ; zapsani do FATky
 
 	; zapise obsah root directory na disk
 	mov cl, 3
@@ -204,6 +205,12 @@ boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 
 textovy_buffer: ; univerzalni buffer pro odkladani dat
 	times 512 db 0
+
+fatka:
+	db 0xF0	; prvni dva bajty jsou magicke konstanty
+	db 0xFF
+	times MAX_POCET_SOUBORU db KONEC_SOUBORU
+	times 494 db 0
 
 definice_souboru:
 	%include "filesystem/files.asm"
