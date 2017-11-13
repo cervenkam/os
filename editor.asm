@@ -22,6 +22,7 @@ nastaveni_fontu:
 vykresleni:
 	call strlen
 	call zaloha_ukazatele
+	;call obnova_ukazatele
 	
 	
 	mov ax, 1
@@ -46,10 +47,10 @@ klavesnice:
 prava_sipka: ;inkrementuje pointer
 	add word [cs:kurzor_pointer], 1
 	push ax
-	mov word ax, [cs:pocet_znaku]
+	mov word ax, [cs:kurzor_pointer] ;pokud je moc za textem
 	inc ax
-	cmp word ax, [cs:kurzor_pointer] ;pokud je moc za textem
-	jne cisteni	
+	cmp word ax, [cs:pocet_znaku]
+	jle cisteni	
 	mov word [cs:kurzor_pointer], 0 ;kurzor zpatky na zacatek
 	pop ax
 	jmp cisteni
@@ -59,6 +60,7 @@ leva_sipka: ;dekrementuje pointer
 	jnc cisteni ;skoc pokud neni -1 carry
 	push ax
 	mov word ax, [cs:pocet_znaku]
+	dec ax
 	mov word [cs:kurzor_pointer], ax ;konec edit textu
 	pop ax
 	jmp cisteni
@@ -78,6 +80,16 @@ zaloha_ukazatele:
 	mov byte al, [cs:bx]
 	mov byte [cs:zalozni_znak], al
 	mov byte [cs:bx], 1 ;dvojtecka jako znak	
+	pop ax
+	pop bx
+	ret
+
+obnova_ukazatele:
+	push ax
+	push bx
+	mov bx, [cs:kurzor_pointer]
+	mov al, [cs:zalozni_znak]
+	mov [cs:buffer_editoru+bx],al
 	pop ax
 	pop bx
 	ret
