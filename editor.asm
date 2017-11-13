@@ -21,15 +21,8 @@ nastaveni_fontu:
 
 vykresleni:
 	call strlen
-
-	xor bx, bx
-	mov bx, buffer_editoru
-	add word bx, [cs:kurzor_pointer]
-	xor ax, ax
-	mov byte al, [cs:bx]
-	mov byte [cs:zalozni_znak], al
+	call zaloha_ukazatele
 	
-	mov byte [cs:bx], 36 ;dvojtecka jako znak	
 	
 	mov ax, 1
 	xor bx, bx
@@ -74,6 +67,20 @@ enter_ulozit:
 	
 konec:
 	int 0x05
+
+zaloha_ukazatele:
+	push bx
+	push ax
+	xor bx, bx
+	mov bx, buffer_editoru
+	add word bx, [cs:kurzor_pointer]
+	xor ax, ax
+	mov byte al, [cs:bx]
+	mov byte [cs:zalozni_znak], al
+	mov byte [cs:bx], 1 ;dvojtecka jako znak	
+	pop ax
+	pop bx
+	ret
 
 strlen:
 	push bx
