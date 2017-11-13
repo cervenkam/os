@@ -7,14 +7,18 @@ bits 16
 interrupt_handler:
 	pusha
 	push es
+	push bx
 
 	mov dx, cs              ; zkopirovani code segmentu do AX
 	mov es, dx              ; a zkopirovani i do extra segmentu
 
-	sub ax,0x36				; odectu konstantu 0x36 abych jel od zacatku jump_table
+	sub ah,0x36				; odectu konstantu 0x36 abych jel od zacatku jump_table
+	mov al,ah
+	xor ah,ah
 	mov bx,ax				; presunu hodnotu z ax do bx
 	shl bx,1				; hodnotu v registru bx vynasobim 2
 	mov dx,[cs:tabulka_skoku+bx] ; spocitam adresu skoku do jump_table
+	pop bx
 	call dx					; skocim do obsluzne procedury
 
 	pop es
@@ -79,9 +83,21 @@ otevri_soubor:				; procedura pro otevreni souboru pro praci AH = 3Dh
 	ret
 zavri_soubor:				; procedura pro zavreni souboru AH = 3Eh
 	ret
-precti_soubor:				; procedura pro precteni kusu souboru AH = 3Fh
+precti_soubor:				; procedura pro precteni kusu souboru AH = 3Fh, bx je id
+	add cl, 3			; buffer bude v 
+	push es
+	mov ax, ds
+	mov es, ax
+	call cteni_sektoru_z_disku
+	pop es
 	ret
 zapis_soubor:				; procedura pro zapsani kusu dat do souboru AH = 40h
+	add cl, 3			; buffer bude v 
+	push es
+	mov ax, ds
+	mov es, ax
+	call zapis_sektoru_na_disk
+	pop es
 	ret
 smaz_soubor:				; procedura pro smazani souboru AH = 41h
 	ret

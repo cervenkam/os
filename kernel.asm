@@ -50,8 +50,7 @@ po_logu:
 	mov bx,0x01
 	int 0x22
 
-	mov dx, tmp_retezec
-	mov ax, 0x37 ; nastaveni procedury formatovat disk
+	mov ah, 0x37 ; nastaveni procedury formatovat disk
 	int 0x21	 ; preruseni pro vykonani formatovani disku
 
 	mov ax,0x01
@@ -191,9 +190,6 @@ pokracuj_interrupt:
 	iret
 pocitadlo:
 	db 17
-
-tmp_retezec:
-	db "temp",0
 
 break:
 	cli
