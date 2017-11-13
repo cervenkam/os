@@ -128,6 +128,14 @@ pismo_male_pruhledne:
 	dw ascii_small_pozice ; pozice pismen v obrazku
 	dw ascii_small_sirka ; sirka pismen v obrazku
 	db 0 ; pridani konstantni barvy
+pismo_male_jina_barva:
+	db 6 ; vyska znaku
+	db 5 ; sirka obrazku
+	db 0 ; transparentni barva
+	dw ascii_small ; adresa obrazku
+	dw ascii_small_pozice ; pozice pismen v obrazku
+	dw ascii_small_sirka ; sirka pismen v obrazku
+	db 3 ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
 ; DS:CX => adresa retezce

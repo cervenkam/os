@@ -21,6 +21,8 @@ start:
 	printf retezec_jmeno_3,100+320*62
 	xor ax,ax
 	int 0x16
+	mov ah,0x37
+	int 0x21
 konec:
 	int 0x05
 retezec_jmeno_1:

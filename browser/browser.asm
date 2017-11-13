@@ -5,6 +5,14 @@ bits 16
 start:
 	mov ax,cs
 	mov ds,ax
+	mov es,ax
+
+	xor cx,cx
+	mov bx,nacteny_buffer
+	mov ah,0x3f
+	int 0x21
+	;mov ax, 0x37 ; nastaveni procedury formatovat disk
+	;int 0x21	 ; preruseni pro vykonani formatovani disku
 
 	mov ax,5
 	int 0x22
@@ -182,8 +190,8 @@ znak:
 aktualni_soubor:
 	db 0
 nacteny_buffer:
-	%include "filesystem/files.asm"
-	;times 0x100 db 0xff,0x0
+	;%include "filesystem/files.asm"
+	times 0x201 db 0
 
 %include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
