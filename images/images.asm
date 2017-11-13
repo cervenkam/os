@@ -229,7 +229,9 @@ text_zobraz_znak:
 	
 doom_pozice:
 ascii_small_pozice:
-	times 32 db 0
+	db 0
+	db 39 ; pozice plneho znaku
+	times 30 db 0
 	db 37
 	times 13 db 0
 	db 38 ; pozice tecky
@@ -250,7 +252,9 @@ doom_sirka:
 	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku
 	times 5 db 0
 ascii_small_sirka:
-	times 32 db 0
+	db 0
+	db 5 ; sirka plneho znaku
+	times 30 db 0
 	db 5 ; sirka mezery
 	times 13 db 0
 	db 1 ; sirka tecky
@@ -367,5 +371,5 @@ zobraz_registr:
 	pop ax
 	ret
 hodiny:
-	db "Hodiny: 00:00:00", 0
+	db "Hodiny",1," 00:00:00", 0
 times 0x3a00-($-$$) db 0
