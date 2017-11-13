@@ -10,6 +10,8 @@ default_editor:
 	;mov ah, 0x3f
 	;mov bx, buffer_editoru ; nactaceni dat (zatim staticky definovane)
 	;int 0x21
+	mov al,[buffer_editoru]
+	mov [zalozni_znak],al
 
 cisteni:
 	mov ax, 5	
@@ -22,7 +24,7 @@ nastaveni_fontu:
 vykresleni:
 	call strlen
 	call zaloha_ukazatele
-	;call obnova_ukazatele
+	call nastaveni_ukazatele
 	
 	
 	mov ax, 1
@@ -36,6 +38,7 @@ vykresleni:
 klavesnice:
 	xor ax, ax
 	int 0x16
+	call obnova_ukazatele
 	cmp ah,0x4B
 	je leva_sipka
 	cmp ah,0x4D
@@ -71,27 +74,32 @@ konec:
 	int 0x05
 
 zaloha_ukazatele:
-	push bx
 	push ax
-	xor bx, bx
-	mov bx, buffer_editoru
-	add word bx, [cs:kurzor_pointer]
-	xor ax, ax
-	mov byte al, [cs:bx]
-	mov byte [cs:zalozni_znak], al
-	mov byte [cs:bx], 1 ;dvojtecka jako znak	
-	pop ax
+	push bx
+	mov bx, [cs:kurzor_pointer]
+	mov al, [cs:buffer_editoru+bx]
+	mov [cs:zalozni_znak],al
 	pop bx
+	pop ax
+	ret
+
+nastaveni_ukazatele:
+	push ax
+	push bx
+	mov bx, [cs:kurzor_pointer]
+	mov byte [cs:buffer_editoru+bx], 1 ;dvojtecka jako znak	
+	pop bx
+	pop ax
 	ret
 
 obnova_ukazatele:
 	push ax
 	push bx
-	mov bx, [cs:kurzor_pointer]
 	mov al, [cs:zalozni_znak]
+	mov bx, [cs:kurzor_pointer]
 	mov [cs:buffer_editoru+bx],al
-	pop ax
 	pop bx
+	pop ax
 	ret
 
 strlen:
