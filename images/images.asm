@@ -379,5 +379,5 @@ zobraz_registr:
 	pop ax
 	ret
 hodiny:
-	db "Hodiny",1," 00:00:00", 0
+	db "Hodiny: 00:00:00", 0
 times 0x3a00-($-$$) db 0
