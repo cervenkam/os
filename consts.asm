@@ -4,7 +4,7 @@
 %define segment_filesystem 0x2000
 %define velikost_filesystem 6
 %define segment_editor 0x3000
-%define velikost_editor 1
+%define velikost_editor 2
 %define segment_prohlizec 0x4000
 %define velikost_prohlizec 3
 %define segment_hra 0x5000

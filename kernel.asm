@@ -50,10 +50,8 @@ po_logu:
 	mov bx,0x01
 	int 0x22
 
-	mov ah, 0x37 ; nastaveni procedury formatovat disk
-	int 0x21	 ; preruseni pro vykonani formatovani disku
 
-	mov ax,0x01
+	mov ax,0x01 ;priprava na vypisovani menu
 	xor dx,dx
 menu_smycka:
 	cmp dx,8
