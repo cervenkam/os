@@ -38,6 +38,8 @@ klavesnice:
 	je prava_sipka
 	cmp ah,0x1C ;enter
 	je enter_ulozit
+	cmp ah,0x0e
+	je backspace
 	jmp jina_klavesa
 
 jina_klavesa:
@@ -52,6 +54,19 @@ jina_klavesa:
 	jina_klavesa_konec_cyklu:	
 	mov [cs:buffer_editoru+bx+1],al
 	inc word [cs:kurzor_pointer]
+	jmp cisteni
+	
+backspace:
+	dec word [cs:kurzor_pointer]
+	mov bx,[cs:kurzor_pointer]
+	backspace_cyklus:
+		cmp bx,512
+		jge backspace_konec_cyklu
+		mov dh,[cs:buffer_editoru+bx+1]
+		mov [cs:buffer_editoru+bx],dh
+		inc bx
+		jmp backspace_cyklus
+	backspace_konec_cyklu:	
 	jmp cisteni
 	
 prava_sipka: ;inkrementuje pointer
