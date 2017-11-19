@@ -1,5 +1,7 @@
 org 0
 bits 16
+%define ZNAKU_NA_RADEK 50
+%define POCET_ODRADKOVANI 10
 start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
@@ -25,16 +27,7 @@ vykresleni:
 	call strlen
 	call zaloha_ukazatele
 	call nastaveni_ukazatele
-	
-	
-	mov ax, 1
-	xor bx, bx
-	mov cx, buffer_editoru
-	int 0x22
-
-	;call strlen
-	;jmp $
-
+	call nakresli
 klavesnice:
 	xor ax, ax
 	int 0x16
@@ -119,14 +112,32 @@ koneccc:
 	mov [cs:pocet_znaku], ax
 	pop cx
 	pop bx
-ret
+	ret
 
-vypis:
-	mov ax,0x05
-	int 0x22
-	mov ax, [cs:kurzor_pointer]
-	call pis16_registry
-	jmp $
+nakresli:
+	pusha
+	mov bx,ZNAKU_NA_RADEK
+	mov cx,0
+	mov ax,1
+	nakresli_cyklus:
+		cmp bx,POCET_ODRADKOVANI*ZNAKU_NA_RADEK
+		jge nakresli_konec_cyklu
+		mov dl,[buffer_editoru+bx]
+		mov byte [buffer_editoru+bx],0
+		push bx
+		mov bx,cx
+		push cx
+		mov cx,buffer_editoru
+		int 0x22
+		pop cx
+		pop bx
+		mov [buffer_editoru+bx],dl
+		add cx,320*12
+		add bx,ZNAKU_NA_RADEK
+		jmp nakresli_cyklus
+	nakresli_konec_cyklu:
+	popa
+	ret
 
 
 pocet_znaku:
