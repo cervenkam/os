@@ -247,7 +247,6 @@ predchozi_soubor:
 nacteny_buffer:
 	times 0x201 db 0
 
-%include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 times 0x600-($-$$) db 0

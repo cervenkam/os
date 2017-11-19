@@ -3,9 +3,9 @@ bits 16
 jmp 0x07c0:start
 %include "consts.asm"
 start:
-	mov ax, cs
-	mov ds, ax
-	mov es, ax
+	mov ax, cs                ; zkopirovani kodoveho segmentu ...
+	mov ds, ax                ; do datoveho segmentu ...
+	mov es, ax                ; a i do extra segmentu
 	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
@@ -59,15 +59,15 @@ restart:
 	db 0xea, 0, 0, 0xff, 0xff ; restart
 
 skok_jadro:
-	jmp segment_jadro:0x0000
+	jmp segment_jadro:0x0000  ; skok do jadra (pevna adresa, jadro teprve nastavi interrupt na skoky mezi programy)
 
 nacti_segmenty:
-	mov cl,ah
-	mov ah,0x02
-	mov es,bx
-	xor bx,bx
-	int 0x13
-	ret
+	mov cl,ah    ; presun cisla segmentu do CL
+	mov ah,0x02  ; nastaveni AH na kod 2 (cteni z disku)
+	mov es,bx    ; nastaveni segmentu, kam se bude zapisovat, na BX
+	xor bx,bx    ; a offset bude nula
+	int 0x13     ; provede se cteni z disku
+	ret          ; a ukonci se podprogram
 
 ; funkce pis16, pise zpravu v realnem 16bitovem rezimu
 ; => DS:AX - adresa zpravy

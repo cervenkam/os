@@ -211,8 +211,6 @@ zalozni_znak:
 id_souboru:
 	db 1
 
-%include "print.asm"
-
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 times 0x800-($-$$) db 0

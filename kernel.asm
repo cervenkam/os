@@ -216,7 +216,6 @@ spustit_program:
 
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
-%include "print.asm"
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
 times 0x1400-($-$$) db 0

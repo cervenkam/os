@@ -282,7 +282,6 @@ doomfaces_pozice:
 	dw 0
 	db 0,1,2,3,4,5
 	times 250 db 0
-%include "print.asm"
 
 ; ziska cas z BIOSu
 ; zadne parametry
