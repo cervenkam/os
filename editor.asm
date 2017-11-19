@@ -1,7 +1,7 @@
 org 0
 bits 16
-%define ZNAKU_NA_RADEK 50
-%define POCET_ODRADKOVANI 10
+%define ZNAKU_NA_RADEK 40
+%define POCET_ODRADKOVANI 12
 start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
@@ -125,14 +125,15 @@ nakresli:
 		mov dl,[buffer_editoru+bx]
 		mov byte [buffer_editoru+bx],0
 		push bx
-		mov bx,cx
 		push cx
-		mov cx,buffer_editoru
+		xchg bx,cx
+		add cx,buffer_editoru
+		sub cx,ZNAKU_NA_RADEK
 		int 0x22
 		pop cx
 		pop bx
 		mov [buffer_editoru+bx],dl
-		add cx,320*12
+		add cx,320*7
 		add bx,ZNAKU_NA_RADEK
 		jmp nakresli_cyklus
 	nakresli_konec_cyklu:
@@ -147,8 +148,8 @@ kurzor_pointer:
 	dw 0
 
 buffer_editoru:
-	db "text12345"
-	times 504 db 0 ;513 protoze posledni bude vzdycky \0
+	db "text12345sadfnaugaeraiogaerhomairehnaregnaruhgaerovmaiorhayorjvojiareijriaohejaiorgioraiegjaeio4624taioergjiq54ty5iy8hahg885858qh8ar"
+	times 450 db 0 ;513 protoze posledni bude vzdycky \0
 
 zalozni_znak
 	db 0
