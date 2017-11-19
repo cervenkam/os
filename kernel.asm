@@ -11,6 +11,7 @@ start:
 
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
 po_logu:
+	cli 			  ; vycistit interrupty
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
 	mov es, ax                ; a zkopirovani i do extra segmentu
@@ -20,7 +21,6 @@ po_logu:
 	
 	xor dx,dx
 	; naveseni interruptu
-	cli 			  ; vycistit interrupty
 	push es
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0

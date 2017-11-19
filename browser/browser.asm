@@ -49,18 +49,24 @@ stisk_klavesy:
 	je enter
 	jmp stisk_klavesy
 sipka_do_strany:
+	mov al,[cs:aktualni_soubor]
+	mov [cs:predchozi_soubor],al
 	xor byte [cs:aktualni_soubor],1
-	jmp start
+	jmp kresli_zmeny
 sipka_dolu:
+	mov al,[cs:aktualni_soubor]
+	mov [cs:predchozi_soubor],al
 	add byte [cs:aktualni_soubor],2
 	xor byte [cs:aktualni_soubor],1
 	and byte [cs:aktualni_soubor],15
-	jmp start
+	jmp kresli_zmeny
 sipka_nahoru:
+	mov al,[cs:aktualni_soubor]
+	mov [cs:predchozi_soubor],al
 	sub byte [cs:aktualni_soubor],2
 	xor byte [cs:aktualni_soubor],1
 	and byte [cs:aktualni_soubor],15
-	jmp start
+	jmp kresli_zmeny
 enter:
 	mov ax,segment_editor
 	mov es,ax
@@ -68,11 +74,54 @@ enter:
 	mov bl,[cs:aktualni_soubor]
 	inc bl
 	int 0x23
+kresli_zmeny:
+	mov bl,[cs:aktualni_soubor]
+	call kresli_jednu_zmenu
+	mov bl,[cs:predchozi_soubor]
+	call kresli_jednu_zmenu
+	jmp stisk_klavesy
+
+kresli_jednu_zmenu:
+	xor cl,cl
+	mov bx,660+960+640
+	xor ax,ax
+	xor dx,dx
+	cyklus_jedna:
+		cmp cl,16
+		jge konec_cyklu_jedna
+		cmp cl,[cs:aktualni_soubor]
+		je muzes_kreslit_1
+		cmp cl,[cs:predchozi_soubor]
+		je muzes_kreslit_1
+		jmp konec_kresleni_1
+		muzes_kreslit_1:
+			call kresli_jeden_soubor
+		konec_kresleni_1:
+		add ax,0x20
+		add bx,160
+		inc cl
+		cmp cl,[cs:aktualni_soubor]
+		je muzes_kreslit_2
+		cmp cl,[cs:predchozi_soubor]
+		je muzes_kreslit_2
+		jmp konec_kresleni_2
+		muzes_kreslit_2:
+			call kresli_jeden_soubor
+		konec_kresleni_2:
+		add ax,0x20
+		add bx,8000-960
+		inc cl
+		xor dh,1
+		jmp cyklus_jedna
+	konec_cyklu_jedna:
+	ret
+	
 konec:
 	int 0x05
 
 ; AX => pozice souboru
 ; BX => pozice, kam se ma kreslit
+; DH => 1/0 smer kresleni
 kresli_jeden_soubor:
 	pusha
 	push ax
@@ -90,7 +139,7 @@ kresli_jeden_soubor:
 	mov [cs:pozice+6],dx
 	mov byte [cs:pozice+8],4
 	pop cx
-	cmp cl,[aktualni_soubor]
+	cmp cl,[cs:aktualni_soubor]
 	jne nemenit_pozadi
 	mov byte [cs:pozice+8],5
 nemenit_pozadi:
@@ -193,8 +242,9 @@ znak:
 	dw 0
 aktualni_soubor:
 	db 0
+predchozi_soubor:
+	db 0
 nacteny_buffer:
-	;%include "filesystem/files.asm"
 	times 0x201 db 0
 
 %include "print.asm"
