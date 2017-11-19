@@ -8,12 +8,12 @@ start:
 	mov es, ax                ; a zkopirovani i do extra segmentu
 
 default_editor:
-	;mov cl, 1
-	;mov ah, 0x3f
-	;mov bx, buffer_editoru ; nactaceni dat (zatim staticky definovane)
-	;int 0x21
-	mov al,[buffer_editoru]
-	mov [zalozni_znak],al
+	mov cl, [cs:id_souboru]
+	mov ah, 0x3f
+	mov bx, buffer_editoru ; nactaceni dat (zatim staticky definovane)
+	int 0x21
+	mov al,[cs:buffer_editoru]
+	mov [cs:zalozni_znak],al
 
 cisteni:
 	mov ax, 5	
@@ -51,6 +51,7 @@ jina_klavesa:
 		jmp jina_klavesa_cyklus
 	jina_klavesa_konec_cyklu:	
 	mov [cs:buffer_editoru+bx+1],al
+	inc word [cs:kurzor_pointer]
 	jmp cisteni
 	
 prava_sipka: ;inkrementuje pointer
@@ -172,7 +173,7 @@ buffer_editoru:
 zalozni_znak:
 	db 0
 id_souboru:
-	db 0
+	db 1
 
 %include "print.asm"
 
