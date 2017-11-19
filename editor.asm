@@ -38,6 +38,19 @@ klavesnice:
 	je prava_sipka
 	cmp ah,0x1C ;enter
 	je enter_ulozit
+	jmp jina_klavesa
+
+jina_klavesa:
+	mov bx,511
+	jina_klavesa_cyklus:
+		cmp bx,[cs:kurzor_pointer]
+		jl jina_klavesa_konec_cyklu
+		mov dh,[cs:buffer_editoru+bx]
+		mov [cs:buffer_editoru+bx+1],dh
+		dec bx
+		jmp jina_klavesa_cyklus
+	jina_klavesa_konec_cyklu:	
+	mov [cs:buffer_editoru+bx+1],al
 	jmp cisteni
 	
 prava_sipka: ;inkrementuje pointer
@@ -62,7 +75,12 @@ leva_sipka: ;dekrementuje pointer
 	jmp cisteni
 
 enter_ulozit:
-	
+	mov ah,0x40
+	xor ch,ch
+	mov cl,[cs:id_souboru]
+	mov bx,buffer_editoru
+	int 0x21
+	jmp cisteni
 konec:
 	int 0x05
 
@@ -151,7 +169,9 @@ buffer_editoru:
 	db "text12345sadfnaugaeraiogaerhomairehnaregnaruhgaerovmaiorhayorjvojiareijriaohejaiorgioraiegjaeio4624taioergjiq54ty5iy8hahg885858qh8ar"
 	times 450 db 0 ;513 protoze posledni bude vzdycky \0
 
-zalozni_znak
+zalozni_znak:
+	db 0
+id_souboru:
 	db 0
 
 %include "print.asm"
