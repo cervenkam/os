@@ -6,6 +6,7 @@ start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
 	mov es, ax                ; a zkopirovani i do extra segmentu
+	mov word [cs:kurzor_pointer], 0
 	mov [cs:id_souboru],bl
 
 default_editor:
@@ -25,7 +26,6 @@ nastaveni_fontu:
 	int 0x22
 
 vykresleni:
-	call strlen
 	call zaloha_ukazatele
 	call nastaveni_ukazatele
 	call nakresli
