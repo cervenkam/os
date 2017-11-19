@@ -24,6 +24,9 @@ po_logu:
 	push es
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0
+	;0x23 spusteni programu
+	mov word [es:0x008c],spustit_program
+	mov word [es:0x008e],segment_jadro
 	;0x22 video sluzby, adresa obsluhy je potom 0x9000:0x0000 (zacatek segmentu)
 	mov word [es:0x0088],0x0000
 	mov word [es:0x008a],segment_obrazky
@@ -131,6 +134,7 @@ enter:
 	push ax
 	xor bx,bx
 	push bx
+	mov bl,1 ;defaultni parametr pro editor
 	retf
 	
 pocet_menu_1:
@@ -200,6 +204,14 @@ break:
 	push cs
 	push po_logu
 	mov bp,sp
+        iret
+
+spustit_program:
+	cli
+	pop dx
+	pop dx
+	push es
+	push ax
         iret
 
 

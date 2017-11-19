@@ -62,8 +62,12 @@ sipka_nahoru:
 	and byte [cs:aktualni_soubor],15
 	jmp start
 enter:
-	; TODO otevrit editor
-	jmp start
+	mov ax,segment_editor
+	mov es,ax
+	xor ax,ax
+	mov bl,[cs:aktualni_soubor]
+	inc bl
+	int 0x23
 konec:
 	int 0x05
 

@@ -6,6 +6,7 @@ start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
 	mov es, ax                ; a zkopirovani i do extra segmentu
+	mov [cs:id_souboru],bl
 
 default_editor:
 	mov cl, [cs:id_souboru]
@@ -203,8 +204,7 @@ kurzor_pointer:
 	dw 0
 
 buffer_editoru:
-	db "text12345sadfnaugaeraiogaerhomairehnaregnaruhgaerovmaiorhayorjvojiareijriaohejaiorgioraiegjaeio4624taioergjiq54ty5iy8hahg885858qh8ar"
-	times 450 db 0 ;513 protoze posledni bude vzdycky \0
+	times 513 db 0 ;513 protoze posledni bude vzdycky \0
 
 zalozni_znak:
 	db 0
