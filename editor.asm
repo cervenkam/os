@@ -86,14 +86,15 @@ backspace:
 posun:
 	add word [cs:kurzor_pointer], ax
 	js posun_nastav_0
-	cmp word [cs:kurzor_pointer],512
-	jge posun_nastav_511
+	call strlen
+	cmp word [cs:kurzor_pointer],ax
+	jge posun_nastav_ax
 	jmp cisteni
 posun_nastav_0:
 	mov word [cs:kurzor_pointer],0
 	jmp cisteni
-posun_nastav_511:
-	mov word [cs:kurzor_pointer],511
+posun_nastav_ax:
+	mov word [cs:kurzor_pointer],ax
 	jmp cisteni
 
 prava_sipka: ;inkrementuje pointer
