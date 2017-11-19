@@ -23,37 +23,37 @@ nacteni_sektoru:
 	mov ax,jadro              ; informace o sektorech jadra
 	mov bx,segment_jadro      ; informace o segmentu jadra
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	; cteni jednotlivych sektoru
 	mov ax,info               ; informace o sektorech informacni obrazovky
 	mov bx,segment_info       ; informace o segmentu informacni obrazovky
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	mov ax,filesystem         ; informace o sektorech filesystemu
 	mov bx,segment_filesystem ; informace o segmentu filesystemu
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	mov ax,editor             ; informace o sektorech editoru
 	mov bx,segment_editor     ; informace o segmentu editoru
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	mov ax,prohlizec          ; informace o sektorech prohlizece
 	mov bx,segment_prohlizec  ; informace o segmentu prohlizece
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	mov ax,hra                ; informace o sektorech hry
 	mov bx,segment_hra        ; informace o segmentu hry
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	mov ax,obrazky            ; informace o sektorech obrazky
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	jc restart
+	jc restart                ; a pokud se to nezdari, restartuj system
 	; konec cteni sektoru
 	jmp skok_jadro            ; skok do nacteneho jadra
 restart:
-	mov ax,zprava_restart
-	call pis16
+	mov ax,zprava_restart     ; nastaveni vypisovaneho retezce na zpravu o restartu
+	call pis16                ; zavolani vypisu retezce restartu
 	xor ax,ax                 ; vyber sluzby BIOSu - cekani na stisk klavesy
 	int 0x16                  ; zavolani sluzeb BIOSu
 	db 0xea, 0, 0, 0xff, 0xff ; restart
@@ -72,10 +72,10 @@ nacti_segmenty:
 ; funkce pis16, pise zpravu v realnem 16bitovem rezimu
 ; => DS:AX - adresa zpravy
 pis16:
-	pusha         ; ulozeni vsech registru do zasobniku
-	push ds
-	mov si, ax    ; nastaveni registru SI na hodnotu znaku ulozenou v AX
-	mov ah, 0x0e  ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
+	pusha             ; ulozeni vsech registru do zasobniku
+	push ds           ; ulozeni i data segmenut do zasobniku
+	mov si, ax        ; nastaveni registru SI na hodnotu znaku ulozenou v AX
+	mov ah, 0x0e      ; nastaveni AH na sluzbu BIOSu cislo 14 (pri int 0x10 je 0x0e psani znaku v TTY rezimu)
 pis16_smycka:
 	lodsb             ; nacteni znaku z adresy DS:SI do registru AL
 	cmp al, 0         ; porovnani na konec retezce
@@ -83,9 +83,9 @@ pis16_smycka:
 	int 0x10          ; volani video sluby BIOSu
 	jmp pis16_smycka  ; opetovne volani, dokud neni konec retezce
 pis16_konec:
-	pop ds
-	popa  ; obnova vsech registru
-	ret   ; ukonceni podprogramu vypisu v 16tibitovem rezimu
+	pop ds            ; obnova data segmentu ze zasobniku
+	popa              ; obnova vsech registru
+	ret               ; ukonceni podprogramu vypisu v 16tibitovem rezimu
 
 zprava_boot:
 	db "Nacteno!" ,0
