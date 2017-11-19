@@ -54,9 +54,18 @@ jina_klavesa:
 	jina_klavesa_konec_cyklu:	
 	mov [cs:buffer_editoru+bx+1],al
 	inc word [cs:kurzor_pointer]
+	cmp word [cs:kurzor_pointer],512
+	jl jina_klavesa_neopravuj
+		mov word [cs:kurzor_pointer],511
+	jina_klavesa_neopravuj:
 	jmp cisteni
 	
 backspace:
+	mov bx,[cs:kurzor_pointer]
+	test bx,bx
+	jnz backspace_neopravuj
+		mov word [cs:kurzor_pointer],1
+	backspace_neopravuj:
 	dec word [cs:kurzor_pointer]
 	mov bx,[cs:kurzor_pointer]
 	backspace_cyklus:
@@ -156,8 +165,8 @@ nakresli:
 	nakresli_cyklus:
 		cmp bx,POCET_ODRADKOVANI*ZNAKU_NA_RADEK
 		jge nakresli_konec_cyklu
-		mov dl,[buffer_editoru+bx]
-		mov byte [buffer_editoru+bx],0
+		mov dl,[cs:buffer_editoru+bx]
+		mov byte [cs:buffer_editoru+bx],0
 		push bx
 		push cx
 		xchg bx,cx
@@ -166,7 +175,7 @@ nakresli:
 		int 0x22
 		pop cx
 		pop bx
-		mov [buffer_editoru+bx],dl
+		mov [cs:buffer_editoru+bx],dl
 		add cx,320*7
 		add bx,ZNAKU_NA_RADEK
 		jmp nakresli_cyklus

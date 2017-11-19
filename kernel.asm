@@ -76,8 +76,8 @@ menu_smycka_konec:
 
 	xor ax,ax
 	int 0x16	
-	mov dl,[pozice]
-	mov [predchozi_pozice],dl
+	mov dl,[cs:pozice]
+	mov [cs:predchozi_pozice],dl
 	cmp ah,0x48 ;sipka nahoru
 	je sipka_nahoru
 	cmp ah,0x50 ;sipka dolu
@@ -86,29 +86,29 @@ menu_smycka_konec:
 	je enter
 	jmp menu_smycka_konec
 sipka_nahoru:
-	cmp byte [pozice],0
+	cmp byte [cs:pozice],0
 	je rotuj_dolu
-	dec byte [pozice]
+	dec byte [cs:pozice]
 	jmp prekresli
 rotuj_dolu:
-	mov bl,[pocet_menu_1]
-	mov [pozice],bl
+	mov bl,[cs:pocet_menu_1]
+	mov [cs:pozice],bl
 	jmp prekresli
 sipka_dolu:
-	mov bl,[pozice]
-	cmp bl,[pocet_menu_1]
+	mov bl,[cs:pozice]
+	cmp bl,[cs:pocet_menu_1]
 	je rotuj_nahoru
-	inc byte [pozice]
+	inc byte [cs:pozice]
 	jmp prekresli
 rotuj_nahoru:
-	mov byte [pozice],0
+	mov byte [cs:pozice],0
 	jmp prekresli
 prekresli:
 	mov ax,0x02
 	mov bx,0x01
 	int 0x22
 	mov ax,0x01
-	mov bl,[predchozi_pozice]
+	mov bl,[cs:predchozi_pozice]
 	shl bx,1
 	mov cx,[cs:tabulka_retezcu+bx]
 	mov bx,[cs:tabulka_pozic+bx]
@@ -117,17 +117,17 @@ prekresli:
 	mov bx,0x02
 	int 0x22
 	mov ax,0x01
-	mov bl,[pozice]
+	mov bl,[cs:pozice]
 	shl bx,1
 	mov cx,[cs:tabulka_retezcu+bx]
 	mov bx,[cs:tabulka_pozic+bx]
 	int 0x22
 	jmp menu_smycka_konec
 enter:
-	mov bl,[pozice]
+	mov bl,[cs:pozice]
 	xor bh,bh
 	shl bx,1
-	mov ax,[tabulka_segmentu+bx]
+	mov ax,[cs:tabulka_segmentu+bx]
 	push ax
 	xor bx,bx
 	push bx
@@ -171,15 +171,15 @@ interrupt:
 	pusha
 	pushf
 	call 0xf000:0xfea5
-	cmp byte [pocitadlo],0
+	cmp byte [cs:pocitadlo],0
 	jne pokracuj_interrupt
 	push ax
 	mov ax,0x03
 	int 0x22
 	pop ax
-	mov byte [pocitadlo],17
+	mov byte [cs:pocitadlo],17
 pokracuj_interrupt:
-	dec byte [pocitadlo]
+	dec byte [cs:pocitadlo]
 	push ax
 	mov al,0x20
 	out 0x20,al
