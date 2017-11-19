@@ -1,7 +1,7 @@
 org 0
 bits 16
 %define ZNAKU_NA_RADEK 40
-%define POCET_ODRADKOVANI 12
+%define POCET_ODRADKOVANI 14
 start:
 	mov ax, cs                ; zkopirovani code segmentu do AX
 	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
@@ -34,6 +34,10 @@ klavesnice:
 	call obnova_ukazatele
 	cmp ah,0x4B
 	je leva_sipka
+	cmp ah,0x48
+	je sipka_nahoru
+	cmp ah,0x50
+	je sipka_dolu
 	cmp ah,0x4D
 	je prava_sipka
 	cmp ah,0x1C ;enter
@@ -43,7 +47,7 @@ klavesnice:
 	jmp jina_klavesa
 
 jina_klavesa:
-	mov bx,511
+	mov bx,510
 	jina_klavesa_cyklus:
 		cmp bx,[cs:kurzor_pointer]
 		jl jina_klavesa_konec_cyklu
@@ -57,6 +61,7 @@ jina_klavesa:
 	cmp word [cs:kurzor_pointer],512
 	jl jina_klavesa_neopravuj
 		mov word [cs:kurzor_pointer],511
+		mov byte [cs:buffer_editoru+512],0
 	jina_klavesa_neopravuj:
 	jmp cisteni
 	
@@ -78,26 +83,32 @@ backspace:
 	backspace_konec_cyklu:	
 	jmp cisteni
 	
-prava_sipka: ;inkrementuje pointer
-	add word [cs:kurzor_pointer], 1
-	push ax
-	mov word ax, [cs:kurzor_pointer] ;pokud je moc za textem
-	inc ax
-	cmp word ax, [cs:pocet_znaku]
-	jle cisteni	
-	mov word [cs:kurzor_pointer], 0 ;kurzor zpatky na zacatek
-	pop ax
+posun:
+	add word [cs:kurzor_pointer], ax
+	js posun_nastav_0
+	cmp word [cs:kurzor_pointer],512
+	jge posun_nastav_511
+	jmp cisteni
+posun_nastav_0:
+	mov word [cs:kurzor_pointer],0
+	jmp cisteni
+posun_nastav_511:
+	mov word [cs:kurzor_pointer],511
 	jmp cisteni
 
+prava_sipka: ;inkrementuje pointer
+	mov ax,1
+	jmp posun
+
 leva_sipka: ;dekrementuje pointer
-	sub word [cs:kurzor_pointer], 1
-	jnc cisteni ;skoc pokud neni -1 carry
-	push ax
-	mov word ax, [cs:pocet_znaku]
-	dec ax
-	mov word [cs:kurzor_pointer], ax ;konec edit textu
-	pop ax
-	jmp cisteni
+	mov ax,0xffff
+	jmp posun
+sipka_dolu:
+	mov ax,ZNAKU_NA_RADEK
+	jmp posun
+sipka_nahoru:
+	mov ax,0xffff-ZNAKU_NA_RADEK+1
+	jmp posun
 
 enter_ulozit:
 	mov ah,0x40
@@ -160,7 +171,7 @@ koneccc:
 nakresli:
 	pusha
 	mov bx,ZNAKU_NA_RADEK
-	mov cx,0
+	mov cx,321*10
 	mov ax,1
 	nakresli_cyklus:
 		cmp bx,POCET_ODRADKOVANI*ZNAKU_NA_RADEK
@@ -176,7 +187,7 @@ nakresli:
 		pop cx
 		pop bx
 		mov [cs:buffer_editoru+bx],dl
-		add cx,320*7
+		add cx,320*8
 		add bx,ZNAKU_NA_RADEK
 		jmp nakresli_cyklus
 	nakresli_konec_cyklu:
