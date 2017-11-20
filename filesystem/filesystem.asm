@@ -84,7 +84,7 @@ otevri_soubor:				; procedura pro otevreni souboru pro praci AH = 3Dh
 zavri_soubor:				; procedura pro zavreni souboru AH = 3Eh
 	ret
 precti_soubor:				; procedura pro precteni kusu souboru AH = 3Fh, bx je id
-	add cl, 3			; buffer bude v 
+	add cl, 3			; buffer bude v
 	push es
 	mov ax, ds
 	mov es, ax
@@ -92,12 +92,43 @@ precti_soubor:				; procedura pro precteni kusu souboru AH = 3Fh, bx je id
 	pop es
 	ret
 zapis_soubor:				; procedura pro zapsani kusu dat do souboru AH = 40h
-	add cl, 3			; buffer bude v 
+	push cx
+	add cl, 3			; buffer bude v
 	push es
 	mov ax, ds
 	mov es, ax
 	call zapis_sektoru_na_disk
 	pop es
+
+
+	call strlen
+	push ax
+	xor cl,cl
+	mov bx,textovy_buffer
+	mov ax,cs
+	push ds
+	mov ds,ax
+	call precti_soubor
+	pop ds
+	pop ax
+	pop cx
+	call pis16_registry
+	jmp $
+
+	mov bx, cx
+	dec bx
+	shl bx, 5
+	add bx, 30
+	mov [cs:textovy_buffer+bx], ah
+	mov [cs:textovy_buffer+bx+1], al
+	mov cl, 3
+	mov bx, textovy_buffer
+	mov ax,cs
+	push es
+	mov es,ax
+	call zapis_sektoru_na_disk
+	pop es
+
 	ret
 smaz_soubor:				; procedura pro smazani souboru AH = 41h
 	ret
@@ -137,7 +168,7 @@ vymaz_textovy_buffer:
 	xor ax, ax
 	.vymazani:
 		mov bx,cx
-		mov byte [textovy_buffer+bx],0
+		mov byte [cs:textovy_buffer+bx],0
 		loop .vymazani
 
 	popa
@@ -169,6 +200,23 @@ porovnej_retezce:
 	.konec:
 		pop di
 		pop si
+		ret
+
+strlen:
+	push bx
+	push cx
+	xor bx,bx
+	xor cx, cx
+	.do:
+		mov cl, [cs:textovy_buffer+bx]
+		cmp cl,0
+		je .koneccc
+		inc bx
+		jmp .do
+	.koneccc:
+		mov ax, bx
+		pop cx
+		pop bx
 		ret
 
 ; datova cast

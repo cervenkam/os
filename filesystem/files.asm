@@ -2,7 +2,7 @@
 db "failos  "	; nazev souboru (max 8b)
 db "txt"		; pripona (3b)
 db 0			; atributy souboru (1b)
-times 10 db 0xab	; rezervovano (10b)
+times 10 db 0	; rezervovano (10b)
 dw 0			; cas vytvoreni, nebo posledniho updatu (2b)
 dw 0			; datum vytvoreni, nebo posledniho updatu (2b)
 dw 2			; cislo prvniho clusteru s obsahem souboru
