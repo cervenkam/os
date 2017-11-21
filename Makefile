@@ -1,6 +1,6 @@
 run: main.bin
 	#find . -type f -name '*.bin' ! -name 'drive.bin' ! -name 'main.bin' -delete
-	qemu-system-x86_64 -drive file=main.bin,format=raw #-drive file=drive.bin,cache=none,format=raw
+	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw
 main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin
 	cat $^ > $@
 kernel.bin: kernel.asm disk.asm splash.asm
