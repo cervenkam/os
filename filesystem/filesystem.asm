@@ -47,15 +47,16 @@ formatuj_disk:				; naformatuje disk AH = 37h
 	call zapis_sektoru_na_disk
 
 
-	; call vymaz_textovy_buffer  ; pro jistotu vymazeme textovy buffer
-	; mov bx, textovy_buffer  ; nastaveni adresy na textovy_buffer, ktery budu zapisovat na disk
-	; .cyklus:
-	; 	inc cl				; inkrementuji cl
-	; 	jo .konec_cyklu 	; ukonci cyklus, pokud jsem pretekl
-	; 	call zapis_sektoru_na_disk
-	; 	jmp .cyklus
+	 call vymaz_textovy_buffer  ; pro jistotu vymazeme textovy buffer
+	 mov bx, textovy_buffer  ; nastaveni adresy na textovy_buffer, ktery budu zapisovat na disk
+	 .cyklus:
+	 	inc cl				; inkrementuji cl
+		cmp cl,16+3
+	 	je .konec_cyklu 	; ukonci cyklus, pokud jsem pretekl
+	 	call zapis_sektoru_na_disk
+	 	jmp .cyklus
 
-	; .konec_cyklu:
+	 .konec_cyklu:
 
 	ret
 nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
