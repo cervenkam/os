@@ -10,17 +10,9 @@ start:
 	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 
 	call obrazek_zobrazit     ; zobrazeni uvodniho obrazku
-po_logu:
-	cli 			  ; vycistit interrupty
-	mov ax, cs                ; zkopirovani code segmentu do AX
-	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
-	mov es, ax                ; a zkopirovani i do extra segmentu
-	mov ss, ax                ; a i do stack segmentu
-	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
-	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
-	
-	xor dx,dx
+
 	; naveseni interruptu
+	cli 			  ; vycistit interrupty
 	push es
 	xor ax, ax
 	mov es, ax 		  ; segmentovy registr = 0
@@ -36,10 +28,21 @@ po_logu:
 	;Ox1B break?
 	mov word [es:0x0014],break
 	mov word [es:0x0016],segment_jadro
+	;0x08 test casovace
+	mov word [es:0x0020],interrupt
+	mov word [es:0x0022],cs
 	pop es
 	sti ;nastavit interrupty
 
-
+po_logu:
+	mov ax, cs                ; zkopirovani code segmentu do AX
+	mov ds, ax                ; zkopirovani tohoto code segmentu do data segmentu (jsou stejne)
+	mov es, ax                ; a zkopirovani i do extra segmentu
+	mov ss, ax                ; a i do stack segmentu
+	mov bp, 0x9000            ; nastaveni bazove adresy zasobniku
+	mov sp, bp                ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
+	
+	xor dx,dx
 	xor ax,ax
 	int 0x22
 	mov ax,0x02
@@ -66,16 +69,6 @@ menu_smycka:
 	add dx,2
 	jmp menu_smycka
 menu_smycka_konec:
-
-	cli 			  ; vycistit interrupty
-	push es
-	xor ax, ax
-	mov es, ax 		  ; segmentovy registr = 0
-	;0x08 test casovace
-	mov word [es:0x0020],interrupt
-	mov word [es:0x0022],cs
-	pop es
-	sti ;nastavit interrupty
 
 	xor ax,ax
 	int 0x16	
@@ -167,7 +160,7 @@ retezec_hra:
 retezec_neco:
 	db "Info",0
 verze:
-	db "Verze OS: 1.0.1", 0
+	db "Verze OS: 1.0.2", 0
 konec:
 	int 0x05
 interrupt:
@@ -194,16 +187,15 @@ pocitadlo:
 	db 17
 
 break:
-	cli
-	pusha
-	pushf
-	call 0xf000:0xff54
-	popa
 	pop ax
 	pop ax
 	push cs
 	push po_logu
 	mov bp,sp
+	pusha
+	pushf
+	call 0xf000:0xff54
+	popa
         iret
 
 spustit_program:
@@ -213,7 +205,6 @@ spustit_program:
 	push es
 	push ax
         iret
-
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
