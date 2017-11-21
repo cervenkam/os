@@ -45,7 +45,7 @@ klavesnice:
 	je enter_ulozit
 	cmp ah,0x0e
 	je backspace
-	test al,0xc0
+	test al,0xa0
 	jz klavesnice
 	jmp jina_klavesa
 
