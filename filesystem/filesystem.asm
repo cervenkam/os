@@ -98,10 +98,10 @@ zapis_soubor:				; procedura pro zapsani kusu dat do souboru AH = 40h
 	mov ax, ds
 	mov es, ax
 	call zapis_sektoru_na_disk
-	pop es
 
 
 	call strlen
+	pop es
 	push ax
 	xor cl,cl
 	mov bx,textovy_buffer
@@ -112,8 +112,6 @@ zapis_soubor:				; procedura pro zapsani kusu dat do souboru AH = 40h
 	pop ds
 	pop ax
 	pop cx
-	call pis16_registry
-	jmp $
 
 	mov bx, cx
 	dec bx
@@ -205,16 +203,19 @@ porovnej_retezce:
 strlen:
 	push bx
 	push cx
-	xor bx,bx
+	push dx
+	mov dx,bx
 	xor cx, cx
 	.do:
-		mov cl, [cs:textovy_buffer+bx]
+		mov cl, [es:bx]
 		cmp cl,0
 		je .koneccc
 		inc bx
 		jmp .do
 	.koneccc:
 		mov ax, bx
+		sub ax, dx
+		pop dx
 		pop cx
 		pop bx
 		ret
