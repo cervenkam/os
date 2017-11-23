@@ -296,10 +296,7 @@ ziskej_hodiny:
 	; vypocet ktery jsem v afektu provedl na papir, vlozil bez kompilace na github
 	; pak otestoval a fungoval, aktualne presne nevim, co se zde deje...
 	; zjistil jsem, ze kdyz pocet ticku prenasobim konstantou 1080/19663, vyjde
-	; pocet sekund, jenze ten se nevejde do 16ti bitoveho registru (sekund za den je 86400,
-	; do 16tibitoveho registru se vejde pouze 65536 sekund), proto jsem se rozhodl,
-	; ze budu pocitat pocet "dvousekund" za den - hodiny proto budou citat po dvou sekundach
-	; a pocet ticku budu prenasobovat hodnotou 540/19663
+	; pocet sekund
 	push ax                ; ulozime si AX na zasobnik
 	push bx                ; ulozime si i BX na zasobnik
 	push dx                ; a i DX na zasobnik
@@ -307,83 +304,81 @@ ziskej_hodiny:
 	mov ax,0x0040          ; do AX vlozime adresu 0x0040 (segment, kde lezi pocet "ticku" od zacatku dne)
 	mov es,ax              ; a tento segment presuneme do extra segmentu
 	xor ax,ax              ; vynulujeme AX
-	mov dx,[es:0x006c]     ; nacteme horni pocet tiku do DX 
-	mov cx,[es:0x006e]     ; a spodni do CX (tiky nyni jsou v DX:CX)
+	mov dx,[es:0x006c]     ; nacteme spodni pocet tiku do DX 
+	mov cx,[es:0x006e]     ; a horni do CX (tiky nyni jsou v CX:DX)
 	pop es                 ; obnovime extra segment
 	mov bx,dx              ; zalohujeme si DX do BX
-	mov ax,cx              ; a CX do AX (tiky jsou nyni bud v DX nebo BX:CX nebo AX)
+	mov ax,cx              ; a CX do AX (tiky jsou nyni bud v CX nebo AX:DX nebo BX)
 	push bx                ; ulozime BX na zasobnik
-	mov bx,1080             ; do BX vlozime 540 (nasobici konstanta, viz komentar na zacatku kodu)
+	mov bx,1080            ; do BX vlozime 1080 (nasobici konstanta, viz komentar na zacatku kodu)
 	mul bx                 ; a touto hodnotou prenasobime AX (vysledek v DX:AX)
-	pop bx                 ; obnovime BX (ticky jsou nyni pouze v BX:CX)
-	mov cx,ax              ; presuneme AX do CX (jiz nemame spodni cast ticku)
-	mov ax,bx              ; a do AX vlozime horni cast ticku
-	push bx                ; ulozime BX (horni cast ticku) na zasobnik
-	mov bx,1080             ; do BX vlozime 540 (nasobici konstatna, viz komentar na zacatku kodu)
-	mul bx                 ; touto konstantou prenasobime AX (horni cast ticku)
-	pop bx                 ; a obnovime horni cast ticku do BX
-	add cx,dx              ; pridame do CX 
-	mov dx,cx
-	push bx
-	mov bx,19663
-	div bx
-	xor dx,dx
-	pop bx
-	mov bx,ax
-	mov cx,60
-	div cx
-	;shl dx,1
-	mov cx,60
-	push dx
-	xor dx,dx
-	div cx
-	push dx
-	mov ch,al
-	pop ax
-	mov cl,al
-	pop ax
-	pop dx
-	mov dh,al
-	pop bx
-	pop ax
+	pop bx                 ; obnovime BX (ticky jsou nyni pouze v CX:BX)
+	mov cx,ax              ; presuneme AX do CX (jiz nemame horni cast ticku)
+	mov ax,bx              ; a do AX vlozime spodni cast ticku
+	push bx                ; ulozime BX (spodni cast ticku) na zasobnik
+	mov bx,1080            ; do BX vlozime 1080 (nasobici konstatna, viz komentar na zacatku kodu)
+	mul bx                 ; touto konstantou prenasobime AX (spodni cast ticku - vysledek v DX:AX)
+	pop bx                 ; a obnovime spodni cast ticku do BX
+	add cx,dx              ; pridame do CX preteceni po nasobeni spodni casti ticku
+	mov dx,cx              ; a CX presuneme do DX (pocet ticku prenasobenych 1080 lezi v CX:AX)
+	push bx                ; pote ulozime BX - spodni cast ticku
+	mov bx,19663           ; a do tohoto registru vlozime delitel 19663 (viz komentar na zacatku kodu)
+	div bx                 ; a vydelime DX:AX/BX (ziskame pocet sekund v AX) TODO tady to vytece
+	xor dx,dx              ; vynulujeme DX, aby jsme s nim nedelili
+	pop bx                 ; obnovime spodni pocet ticku v BX
+	mov bx,ax              ; a do BX vlozime pocet sekund
+	mov cx,60              ; ten budeme delit 60ti
+	div cx                 ; takze ho vydelime (pocet minut = AX, pocet sekund%60 = DX)
+	push dx                ; ulozime pocet sekund v minute na zasobnik
+	xor dx,dx              ; znovu vynulujeme DX, aby jsme s nim nedelili
+	div cx                 ; a vydelime pocet minut 60ti (pocet hodin = AX, pocet minut%60 = DX)
+	mov ch,al              ; do CH (navratova hodnota hodin) vlozime AL
+	mov cl,dl              ; do CL (navratova hodnota minut) vlozime DL
+	pop ax                 ; obnovime pocet sekund v minute do AX
+	pop dx                 ; obnovime DX do puvodniho stavu (dale pouze prepiseme DH)
+	mov dh,al              ; a do DH (navratova hodnota sekund) vlozime DH
+	pop bx                 ; obnovime registr BX
+	pop ax                 ; a registr AX
 	ret
 zobraz_hodiny:
-	pusha
-	push ds
-	mov ax, cs
-	mov ds, ax
-	call ziskej_hodiny
-	mov bx,8
-	xor ah,ah
-	mov al,ch
-	call zobraz_registr
-	mov al,cl
-	call zobraz_registr
-	mov al,dh
-	call zobraz_registr
-	mov cx,hodiny
-	mov bx,0xee6e
-	mov word [aktivni_pismo],pismo_male
-	call text_zobrazit
-	pop ds
-	popa
-	ret		
+	pusha                                  ; ulozime si stav vsech registru
+	push word [cs:aktivni_pismo]           ; ulozime si aktivni pismo
+	push ds                                ; ulozime si i stav datoveho segmentu
+	mov ax, cs                             ; do AX ulozime aktualni kodovy segment
+	mov ds, ax                             ; a tento segment presuneme do datoveho segmentu
+	call ziskej_hodiny                     ; zavolame ziskani hodin (CH:CL:DH)
+	mov bx,8                               ; do BX vlozime 8ku (adresa, odkud budeme do retezce zapisovat (za "Hodiny: "))
+	xor ah,ah                              ; vycistime AH
+	mov al,ch                              ; a do AL vlozime CH (hodiny)
+	call zobraz_registr                    ; a zobrazime registr (BX se nam automaticky posune na dalsi udaj)
+	mov al,cl                              ; do AL vlozime CL (minuty)
+	call zobraz_registr                    ; a zobrazime registr AL (BX se opet posune sam)
+	mov al,dh                              ; nakonec do AL vlozime i DH (sekundy)
+	call zobraz_registr                    ; a zobrazime hodiny
+	mov cx,hodiny                          ; nakonec hodiny vykreslime, adresu vlozime do CX
+	mov bx,0xee6e                          ; vykreslovaci pozici do BX
+	mov word [cs:aktivni_pismo],pismo_male ; nastavime aktivni pismo na pismo_male
+	call text_zobrazit                     ; a zobrazime text
+	pop ds                                 ; nakonec obnovime datovy segment
+	pop word [cs:aktivni_pismo]            ; a aktivni pismo obnovime
+	popa                                   ; obnovime i zbytek registru
+	ret		                       ; a vratime se z podprogramu
 
 zobraz_registr:
-	push ax
-	push cx
-	push dx
-	mov cx,10
-	div cl
-	add ax,0x3030
-	mov [hodiny+bx],al
-	inc bx
-	mov [hodiny+bx],ah
-	add bx,2
-	pop dx
-	pop cx
-	pop ax
-	ret
+	push ax                  ; ulozime stav AX
+	push cx                  ; i stav CX
+	push dx                  ; nakonec i stav DX, budeme menit pouze BX
+	mov cx,10                ; do CX vlozime 10 (tim budeme delit vstupni registr AL)
+	div cl                   ; takze AL vydelime 10, ziskame dve cislice v AL a AH
+	add ax,0x3030            ; pridame k cislicim ASCII nulu '0'
+	mov [cs:hodiny+bx],al    ; vlozime do hodin horni cislici
+	inc bx                   ; posuneme se na dalsi cislici
+	mov [cs:hodiny+bx],ah    ; vlozime do hodin spodni cislici
+	add bx,2                 ; posuneme se na dalsi cast (preskocime dvojtecku)
+	pop dx                   ; obnovime stav registru DX
+	pop cx                   ; stav registru CX
+	pop ax                   ; i AX
+	ret                      ; a vratime se z podprogramu
 hodiny:
 	db "Hodiny: 00:00:00", 0
 times 0x3a00-($-$$) db 0

@@ -126,6 +126,18 @@ enter_ulozit:
 	mov cl,[cs:id_souboru]             ; do CL vlozime ID tohoto souboru
 	mov bx,buffer_editoru              ; a predame adresu ukladanych dat pres registr BX
 	int 0x21                           ; zavolame sluzbu filesystemu
+	mov ax,0x4                         ; zvolime sluzbu cislo 4 graficke knihovny - vykresleni obdelniku
+	mov bx,ulozeni_pozadi              ; vlozime do BX adresu struktury souradnic pozadi
+	int 0x22                           ; zavolani graficke knihovny
+	mov ax,0x2                         ; nastaveni kodu 2 (zmena fontu)
+	mov bx,0x1                         ; na doom font s pruhlednym pozadim
+	int 0x22                           ; a volani graficke knihovny
+	mov ax,0x1                         ; nastaveni kodu 1 (vypis textu)
+	mov cx,text_ulozeno                ; nastaveni adresy retezce
+	mov bx,100+320*92                  ; nastaveni vykreslovaciho indexu
+	int 0x22                           ; a volani graficke knihovny
+	xor ax,ax                          ; ID sluzby 0 cekani na stisk klavesy
+	int 0x16                           ; a volani sluzby BIOSu
 	jmp cisteni                        ; a prekreslime editor
 konec:
 	int 0x05                           ; prirozeny konec editoru - NEMEL BY NASTAT - vzdy cekame na stisk klavesy :/
@@ -213,6 +225,16 @@ zalozni_znak:
 
 id_souboru:
 	db 1                                              ; ID akutalne otevreneho souboru
+
+ulozeni_pozadi:
+	dw 80   ; souradnice Y1 vykreslovaneho dialogu
+	dw 120  ; souradnice Y2 vykreslovaneho dialogu
+	dw 50   ; souradnice X1 vykreslovaneho dialogu
+	dw 270  ; souradnice X2 vykreslovaneho dialogu
+	db 2    ; barva dialogu
+
+text_ulozeno:
+	db "Ulozeno",0  ; text dialogu
 
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
 ;NEZAPOMENOUT upravit velikost tohoto segmentu i v makru loaderu !!!!
