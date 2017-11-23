@@ -323,10 +323,13 @@ ziskej_hodiny:
 	mov cx,[es:0x006e]     ; a horni do CX (tiky nyni jsou v CX:DX)
 	cmp cx,0xc             ; porovnani, jestli horni cast ticku nenaznacuje odpoledne
 	jl neopravuj_hodiny    ; pokud ne, nebudou se hodiny opravovat
-	cmp dx,0x5            ; porovnani, jestli neni odpoledne
+	cmp cx,0xc
+	jg urcite_oprav_hodiny
+	cmp dx,0x5             ; porovnani, jestli neni odpoledne
 	jl neopravuj_hodiny    ; pokud neni, nebudou se hodiny opravovat
-	sub cx,0xc            ; odecteme dopoledne od hodin a i v dolni casti ticku
+urcite_oprav_hodiny:
 	sub dx,0x5             ; odecteme dopoledne od hodin v horni casti ticku
+	sbb cx,0xc             ; odecteme dopoledne od hodin a i v dolni casti ticku (a spolu s borrow flagem)
 neopravuj_hodiny:
 	pop es                 ; obnovime extra segment
 	mov bx,dx              ; zalohujeme si DX do BX

@@ -3,7 +3,7 @@ run: main.bin
 	# smazani vsech jiz nepotrebnych binarnich souboru
 	# find . -type f -name '*.bin' ! -name 'drive.bin' ! -name 'main.bin' -delete
 	# spusteni programu v qemu
-	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw -rtc base='2017-11-23T20:00:00'
+	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw # -rtc base='2017-11-23T20:00:00'
 # vytvoreni binarniho obrazu OS
 main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin
 	# k tomu pouzijeme "linker" - proste vlozime dane soubory za sebe
