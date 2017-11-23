@@ -1,9 +1,10 @@
 # Semestral work KIV/OS
 
-Minimalistic Operating System - **FailOS** 
+Minimalistic real mode Operating System - **FailOS** 
 
-<img src="https://download.hornet-cz.com/public/FailOS.png" width="250px"/>
-
+<p align="center">
+  <img src="https://download.hornet-cz.com/public/FailOS.png" width="250px"/>
+</p>
 
 ## Installation
 
@@ -16,10 +17,12 @@ In project directory do **make** and praise the KEK
 ## Features
 * bootloader
 * works in video mode with two fancy fonts and nice GUI
-* primitive filesystem on second disk with 8 kB of space (16 files by 512B)
-* interactive filebrowser with doom style icon indicating file size
-* text editor for editing files 
+* primitive filesystem on second disk with 8 kB of free space (16 files by 512B)
+* interactive filebrowser with doom style icon file size indicator
+* working text editor with cursor, [A-Z] + [0-9] + ' ' chars
 * independently driven clock on bottom of the screen
+* Loyd's Fifteen game
+
 
 ## Controls
 * **Arrows** for navigation
@@ -32,11 +35,13 @@ In project directory do **make** and praise the KEK
 * Anton&iacute;n Vrba
 * Martin &Ccaron;ervenka
 
-<img src="https://download.hornet-cz.com/public/fos_menu.png" width="300px"/>
-<img src="https://download.hornet-cz.com/public/fos_browser.png" width="300px"/>
-<img src="https://download.hornet-cz.com/public/editor_save.png" width="300px"/>
-<img src="https://download.hornet-cz.com/public/game.png" width="300px"/>
-<img src="https://download.hornet-cz.com/public/info.png" width="300px"/>
+<p align="center">
+<img src="https://download.hornet-cz.com/public/fos_menu.png" width="400px"/>
+<img src="https://download.hornet-cz.com/public/fos_browser.png" width="400px"/>
+<img src="https://download.hornet-cz.com/public/editor_save.png" width="400px"/>
+<img src="https://download.hornet-cz.com/public/game.png" width="400px"/>
+<img src="https://download.hornet-cz.com/public/info.png" width="400px"/>
+</p>
 
 
 
