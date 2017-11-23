@@ -312,24 +312,26 @@ ziskej_hodiny:
 	; pak otestoval a fungoval, aktualne presne nevim, co se zde deje...
 	; zjistil jsem, ze kdyz pocet ticku prenasobim konstantou 1080/19663, vyjde
 	; pocet sekund
-	push ax                ; ulozime si AX na zasobnik
-	push bx                ; ulozime si i BX na zasobnik
-	push dx                ; a i DX na zasobnik
-	push es                ; nakonec i extra segment
-	mov ax,0x0040          ; do AX vlozime adresu 0x0040 (segment, kde lezi pocet "ticku" od zacatku dne)
-	mov es,ax              ; a tento segment presuneme do extra segmentu
-	xor ax,ax              ; vynulujeme AX
-	mov dx,[es:0x006c]     ; nacteme spodni pocet tiku do DX 
-	mov cx,[es:0x006e]     ; a horni do CX (tiky nyni jsou v CX:DX)
-	cmp cx,0xc             ; porovnani, jestli horni cast ticku nenaznacuje odpoledne
-	jl neopravuj_hodiny    ; pokud ne, nebudou se hodiny opravovat
-	cmp cx,0xc
-	jg urcite_oprav_hodiny
-	cmp dx,0x54            ; porovnani, jestli neni odpoledne
-	jl neopravuj_hodiny    ; pokud neni, nebudou se hodiny opravovat
+	push ax                    ; ulozime si AX na zasobnik
+	push bx                    ; ulozime si i BX na zasobnik
+	push dx                    ; a i DX na zasobnik
+	push es                    ; nakonec i extra segment
+	mov ax,0x0040              ; do AX vlozime adresu 0x0040 (segment, kde lezi pocet "ticku" od zacatku dne)
+	mov es,ax                  ; a tento segment presuneme do extra segmentu
+	xor ax,ax                  ; vynulujeme AX
+	mov dx,[es:0x006c]         ; nacteme spodni pocet tiku do DX 
+	mov cx,[es:0x006e]         ; a horni do CX (tiky nyni jsou v CX:DX)
+	mov byte [cs:odpoledne],0  ; budeme predpokladat, ze neni odpoledne
+	cmp cx,0xc                 ; porovnani, jestli horni cast ticku nenaznacuje odpoledne
+	jl neopravuj_hodiny        ; pokud ne, nebudou se hodiny opravovat
+	cmp cx,0xc                 ; test, jestli nejsme s horni casti pres - bude urcite odpoledne
+	jg urcite_oprav_hodiny     ; skocime na opravu hodin
+	cmp dx,0x54                ; porovnani, jestli neni odpoledne podle spodni casti, horni cast nam nic neprozradila
+	jl neopravuj_hodiny        ; pokud neni, nebudou se hodiny opravovat
 urcite_oprav_hodiny:
-	sub dx,0x54            ; odecteme dopoledne od hodin v horni casti ticku
-	sbb cx,0xc             ; odecteme dopoledne od hodin a i v dolni casti ticku (a spolu s borrow flagem)
+	sub dx,0x54                ; odecteme dopoledne od hodin v horni casti ticku
+	sbb cx,0xc                 ; odecteme dopoledne od hodin a i v dolni casti ticku (a spolu s borrow flagem)
+	mov byte [cs:odpoledne],12 ; nastavime, ze je odpoledne
 neopravuj_hodiny:
 	pop es                 ; obnovime extra segment
 	mov bx,dx              ; zalohujeme si DX do BX
@@ -348,7 +350,7 @@ neopravuj_hodiny:
 	mov dx,cx              ; a CX presuneme do DX (pocet ticku prenasobenych 1080 lezi v CX:AX)
 	push bx                ; pote ulozime BX - spodni cast ticku
 	mov bx,19663           ; a do tohoto registru vlozime delitel 19663 (viz komentar na zacatku kodu)
-	div bx                 ; a vydelime DX:AX/BX (ziskame pocet sekund v AX) TODO tady to vytece
+	div bx                 ; a vydelime DX:AX/BX (ziskame pocet sekund v AX)
 	xor dx,dx              ; vynulujeme DX, aby jsme s nim nedelili
 	pop bx                 ; obnovime spodni pocet ticku v BX
 	mov bx,ax              ; a do BX vlozime pocet sekund
@@ -375,6 +377,7 @@ zobraz_hodiny:
 	mov bx,8                               ; do BX vlozime 8ku (adresa, odkud budeme do retezce zapisovat (za "Hodiny: "))
 	xor ah,ah                              ; vycistime AH
 	mov al,ch                              ; a do AL vlozime CH (hodiny)
+	add al,[cs:odpoledne]                  ; pridame do AL odpoledne
 	call zobraz_registr                    ; a zobrazime registr (BX se nam automaticky posune na dalsi udaj)
 	mov al,cl                              ; do AL vlozime CL (minuty)
 	call zobraz_registr                    ; a zobrazime registr AL (BX se opet posune sam)
@@ -404,6 +407,8 @@ zobraz_registr:
 	pop cx                   ; stav registru CX
 	pop ax                   ; i AX
 	ret                      ; a vratime se z podprogramu
+odpoledne:
+	db 0
 hodiny:
 	db "Hodiny: 00:00:00", 0
 %include "print.asm"
