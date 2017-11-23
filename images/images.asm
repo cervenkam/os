@@ -325,10 +325,10 @@ ziskej_hodiny:
 	jl neopravuj_hodiny    ; pokud ne, nebudou se hodiny opravovat
 	cmp cx,0xc
 	jg urcite_oprav_hodiny
-	cmp dx,0x5             ; porovnani, jestli neni odpoledne
+	cmp dx,0x54            ; porovnani, jestli neni odpoledne
 	jl neopravuj_hodiny    ; pokud neni, nebudou se hodiny opravovat
 urcite_oprav_hodiny:
-	sub dx,0x5             ; odecteme dopoledne od hodin v horni casti ticku
+	sub dx,0x54            ; odecteme dopoledne od hodin v horni casti ticku
 	sbb cx,0xc             ; odecteme dopoledne od hodin a i v dolni casti ticku (a spolu s borrow flagem)
 neopravuj_hodiny:
 	pop es                 ; obnovime extra segment
