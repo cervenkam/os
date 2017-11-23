@@ -1,19 +1,32 @@
-# Semestr&aacute;ln&iacute; pr&aacute;ce z KIV/OS
+# Semestral work KIV/OS
 
-Minimalistick&yacute; OS, kter&yacute; je vytvo&rcaron; v r&aacute;mci semestr&aacute;ln&iacute; pr&aacute; 2017/2018 z KIV/OS.
+Minimalistic Operating System - **FailOS** 
 
-## Instalace
+<img src="https://download.hornet-cz.com/public/FailOS.png" alt="Drawing" style="width: 200px;"/>
 
-Pro p&rcaron;eklad je t&rcaron;eba program **nasm** (lze p&rcaron;elo&zcaron;it verz&iacute; 2.12.02)
-Pro spu&scaron;t&ecaron;n&iacute; lze pou&zcaron;&iacute;t nap&rcaron;&iacute;klad emul&aacute;tor **qemu** (**qemu-system-x86\_64**, tesov&aacute;no verz&iacute; 2.8.0), nebo lze OS nabootovat p&rcaron;&iacute;mo na HW.
+## Installation
 
-## Spu&scaron;t&ecaron;n&iacute;
+For compilation use **nasm** (working with version 2.13.01)
+For run you will have to install **qemu** (**qemu-system-x86\_64**, working with  2.10.1)
 
-Sta&ccaron;&iacute; zavolat **make** v pracovn&iacute;m adres&aacute;&rcaron;i projektu a v grafick&eacute;m re&zcaron;imu. Alternativn&ecaron; lze zavolat
-**make** i bez grafick&ecaron;ho re&zcaron;imu a n&aacute;sledn&ecaron; zkop&iacute;rovat/vyp&aacute;lit vytvo&rcaron;en&yacute; soubor **\*.bin** na
-disk a nabootovat OS bez emul&aacute;toru
+## Run
 
-## Auto&rcaron;i
+In project directory do **make** and praise the KEK
+
+## Features
+* bootloader
+* works in video mode with two fancy fonts and nice GUI
+* primitive filesystem on second disk with 8 kB of space (16 files by 512B)
+* interactive filebrowser with doom style icon indicating file size
+* text editor for editing files 
+* independently driven clock on bottom of the screen
+
+## Controls
+* **Arrows** for navigation
+* **Enter** for choosing item/saving file in editor
+* **PrtSc** for getting back in main menu
+
+## Authors
 
 * Petr &Scaron;techm&uuml;ller
 * Anton&iacute;n Vrba
