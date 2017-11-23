@@ -5,31 +5,29 @@ org 0
 bits 16
 
 interrupt_handler:
-	pusha
-	push es
-	push bx
+	pusha                   ; ulozim si registry na zasonik
+	push es					; ulozim extrasegment
+	push bx					; jeste jednou si ulozim bx
 
 	mov dx, cs              ; zkopirovani code segmentu do AX
 	mov es, dx              ; a zkopirovani i do extra segmentu
 
-	sub ah,0x36				; odectu konstantu 0x36 abych jel od zacatku jump_table
-	mov al,ah
-	xor ah,ah
+	sub ah,0x37				; odectu konstantu 0x37 abych jel od zacatku jump_table
+	mov al,ah				; presunu cislo sluzby do al
+	xor ah,ah				; vynuluji registr ah
 	mov bx,ax				; presunu hodnotu z ax do bx
 	shl bx,1				; hodnotu v registru bx vynasobim 2
 	mov dx,[cs:tabulka_skoku+bx] ; spocitam adresu skoku do jump_table
-	pop bx
+	pop bx					; obnovim registr bx - muze obsahovat nejaky parametr
 	call dx					; skocim do obsluzne procedury
 
-	pop es
-	popa
-	iret
+	pop es					; obnovim extrasegment
+	popa  					; obnovim zbytek registru ze zasobniku
+	iret 					; vracim se zpet z preruseni
 
 %include "disk.asm"
 %include "print.asm"
 
-velikost_disku:				; vypocet velikosti velikost_disku AH = 36h
-	ret
 formatuj_disk:				; naformatuje disk AH = 37h
 	; zapise boot sektor na disk
 	mov cl, 1				; nastaveni indexu sektoru v disku
@@ -59,193 +57,106 @@ formatuj_disk:				; naformatuje disk AH = 37h
 	 .konec_cyklu:
 
 	ret
-nova_slozka:				; procedura pro vytvoreni nove slozky AH = 39h
-	ret
-smaz_slozku:				; procedura pro smazani slozky AH = 3Ah
-	ret
-nastav_slozku:				; procedura pro nastaveni aktualni slozky (cd) AH = 3Bh
-	mov si, dx
-	mov bx, 0
-	.cyklus:
-		lodsb
-		test al, al
-		jz .konec
-		mov byte [textovy_buffer+bx],al
-		inc bx
-
-		jmp .cyklus
-
-	.konec:
-
-	ret
-novy_soubor:				; procedura pro vytvoreni noveho prazdneho souboru AH = 3Ch
-	ret
-otevri_soubor:				; procedura pro otevreni souboru pro praci AH = 3Dh
-	ret
-zavri_soubor:				; procedura pro zavreni souboru AH = 3Eh
-	ret
-precti_soubor:				; procedura pro precteni kusu souboru AH = 3Fh, bx je id
-	add cl, 3			; buffer bude v
-	push es
-	mov ax, ds
-	mov es, ax
-	call cteni_sektoru_z_disku
-	pop es
-	ret
-zapis_soubor:				; procedura pro zapsani kusu dat do souboru AH = 40h
-	push cx
-	add cl, 3			; buffer bude v
-	push es
-	mov ax, ds
-	mov es, ax
-	call zapis_sektoru_na_disk
+precti_soubor:						; procedura pro precteni kusu souboru AH = 3Fh
+									; cx = id souboru
+									; ds:bx = buffer na obsah souboru
+	add cl, 3						; cl registr (s id souboru) inkrementuji o 3, abych
+									; se dostal do spravneho sektoru FATky
+	push es							; ulozim si extrasegment
+	mov ax, ds						; do registru ax vlozim pointer na buffer na obsah souboru
+	mov es, ax						; do es vlozim obsah ax
+	call cteni_sektoru_z_disku		; nactu obsah souboru z disku
+	pop es							; obnovim extra segment
+	ret 							; vratim se z procedury
+zapis_soubor:						; procedura pro zapsani kusu dat do souboru AH = 40h
+									; cx = id souboru
+									; ds:bx = buffer s obsahem souboru
+	push cx							; ulozim si id souboru na zasobnik
+	add cl, 3						; cl registr (s id souboru) inkrementuji o 3, abych
+									; se dostal do spravneho sektoru FATky
+	push es							; ulozim si extrasegment, protoze ho budu prepisovat
+	mov ax, ds 						; do ax ulozim pointer na buffer s obsahem souboru
+	mov es, ax						; z ax vlotim tento pointer do es
+	call zapis_sektoru_na_disk		; zapisu obsah souboru na disk
 
 
-	call strlen
-	pop es
-	push ax
-	xor cl,cl
-	mov bx,textovy_buffer
-	mov ax,cs
-	push ds
-	mov ds,ax
-	call precti_soubor
-	pop ds
-	pop ax
-	pop cx
+	call strlen 					; zjistim velikost souboru (vysledek do ax)
+	pop es 							; obnovim drive ulozeny extrasegment
+	push ax							; ulozim si velikost souboru na zasobnik
+	xor cl,cl						; vymazu obsah registru cl
+	mov bx,textovy_buffer 			; do registru bx vlozim adresu s textovym bufferem
+	mov ax,cs						; do registru ax vlozim cs
+	push ds							; ulozim registr ds na zasobnik
+	mov ds,ax						; do registru ds ulozim hodnotu registru ax
+	call precti_soubor				; nactu root directory do textoveho bufferu
+	pop ds							; obnovim registr ds
+	pop ax							; obnovim registr ax
+	pop cx							; obnovim registr cx (s id souboru)
 
-	mov bx, cx
-	dec bx
-	shl bx, 5
-	add bx, 30
-	mov [cs:textovy_buffer+bx], ah
-	mov [cs:textovy_buffer+bx+1], al
-	mov cl, 3
-	mov bx, textovy_buffer
-	mov ax,cs
-	push es
-	mov es,ax
-	call zapis_sektoru_na_disk
-	pop es
+									; ted spocitam index, na kterem se nachazi
+									; informace o velikosti souboru v boot recordu
+	mov bx, cx						; do bx ulozim id souboru
+	dec bx							; odectu jednicku, protoze se indexuje od 0
+	shl bx, 5						; vynasobim bx 2^5 = 32 = velikost jednoho
+									; zaznamu o souboru v root directory
+	add bx, 30						; prictu 30 = index, na kterem se nachazi velikost
+	mov [cs:textovy_buffer+bx], ah	; na vypoctenou adresu vlozim vypoctenou hodnotu
+	mov [cs:textovy_buffer+bx+1], al; musim davat bacha na endianovost
+	mov cl, 3						; vlozim do cl 3 = root directory
+	mov bx, textovy_buffer 			; vlozim do bx pointer na textovy buffer
+	mov ax,cs						; do ax si ulozim code segment
+	push es							; ulozim si extrasegment do zasobniku
+	mov es,ax						; do es vlozim ax
+	call zapis_sektoru_na_disk		; zapisu velikost souboru do root directory
+	pop es							; obnovim es
 
-	ret
-smaz_soubor:				; procedura pro smazani souboru AH = 41h
-	ret
-nastav_pozici_v_souboru:	; procedura pro nastaveni pracovni pozice v souboru AH = 42h
-	ret
-ziskej_atributy_souboru:	; procedura pro ziskani atributu souboru AH = 43h
-	ret
-nastav_atributy_souboru:	; procedura pro nastaveni atributu souboru AH = 43h
-	ret
-ziskej_nazev_aktualniho_adresare:	; procedura pro ziskani nazvu aktualniho adresare AH = 47h
-	ret
-prejmenuj_soubor:			; procedura pro prejmenovani souboru AH = 56h
-	ret
-ziskej_casovy_udaj_o_souboru:		; procedura pro ziskani casoveho udaje o souboru AH = 57h
-	ret
-nastav_casovy_udaj_o_souboru:		; procedura pro nastaveni casoveho udaje o souboru AH = 57h
-	ret
-pomocna_atributy_souboru:			; pomocna procedura pro obsluhuprace s atributem souboru
-	cmp al, 0
-	je pokracuj_dal
-	call nastav_atributy_souboru
-	jmp konec_1
-	pokracuj_dal:
-		call ziskej_atributy_souboru
-	konec_1:
-		ret
-pomocna_casovy_udaj_o_souboru:		; pomocna procedura pro obsluhu prace s casovym udajem o souboru
-	ret
-konec:
-	jmp 0x1000:0x0000
+	ret 							; vratim se z precedury
+
+
 
 ; pomocna procedura pro vycisteni bufferu
 vymaz_textovy_buffer:
-	pusha
+	pusha 								; ulozim si registry na zasobnik 
 
-	mov cx, 512
-	xor ax, ax
+	mov cx, 512							; vlozim do cx velikost bufferu = 512
+	xor ax, ax							; vymazu ax registr
 	.vymazani:
-		mov bx,cx
-		mov byte [cs:textovy_buffer+bx],0
-		loop .vymazani
+		mov bx,cx						; presunu hodnotu z cx do bx
+		mov byte [cs:textovy_buffer+bx],0	; na vypoctenou adresu zapisu 0
+		loop .vymazani					; skacu na .loop, dokud v cx neni 0
 
-	popa
-
-; DS:SI prvni porovnavany retezec
-; ES:DI druhy porovnavany retezec
-; vysledek se ulozi do al registru
-porovnej_retezce:
-	push si
-	push di
-
-	.cyklus:
-		lodsb 		; nacte ASCII hodnotu z DS:SI do al a inkrementuje SI
-		mov ah, [es:di] ; nacte ASCII hodnotu z ES:DI do ah
-		inc di		; inkrementuje di
-
-		xor al, ah
-		jnz .nejsou_stejny	; pokud al neni nulovy, tak nejsou testovane znaky stejny
-
-		test ah, ah ; otestuje registr al (neco jako al AND al)
-		jz .jsou_stejny
-
-		jmp .cyklus
-	.nejsou_stejny:
-		mov al, 1	; nastavime vysledek na 0 - nejsou stejny
-		jmp .konec
-	.jsou_stejny:
-		mov al, 0	; nastavime vysledek na 1 - jsou stejny
-	.konec:
-		pop di
-		pop si
-		ret
+	popa 								; obnovim vsechny registry
+	ret 								; vracim se z procedury
 
 strlen:
-	push bx
-	push cx
-	push dx
-	mov dx,bx
-	xor cx, cx
+	push bx						; ulozim bx
+	push cx						; spolu s cx
+	push dx						; a dx na zasobnik
+	mov dx,bx					; presunu obsah registru bx do dx
+	xor cx, cx					; vynuluji registr cx
 	.do:
-		mov cl, [es:bx]
-		cmp cl,0
-		je .koneccc
-		inc bx
-		jmp .do
+		mov cl, [es:bx]			; do cl vlozim obsah na vypoctene adrese
+		cmp cl,0				; pokud je v cl 0 = konec retezce
+		je .koneccc				; pokud jsem na konci, skocim na koneccc
+		inc bx					; jinak inkrementuji bx
+		jmp .do					; a skacu zpet na .do
 	.koneccc:
-		mov ax, bx
-		sub ax, dx
-		pop dx
-		pop cx
-		pop bx
-		ret
+		mov ax, bx				; ulozim velikost retezce do ax
+		sub ax, dx				; odectu adresu, kde byl retezec
+								; abych ziskal spravnou velikost
+		pop dx					; obnovim registr dx
+		pop cx					; obnovim registr cx
+		pop bx					; obnovim registr bx
+		ret 					; vracim se z procedury 
 
 ; datova cast
 ;=================================================
 
 tabulka_skoku:
-	dw velikost_disku					; 36h
 	dw formatuj_disk					; 37h
-	dw 0								; 38h
-	dw nova_slozka						; 39h
- 	dw smaz_slozku						; 3Ah
- 	dw nastav_slozku					; 3Bh
- 	dw novy_soubor						; 3Ch
- 	dw otevri_soubor					; 3Dh
- 	dw zapis_soubor						; 3Eh
+	times 7 dw 0
  	dw precti_soubor					; 3Fh
  	dw zapis_soubor						; 40h
- 	dw smaz_soubor						; 41h
- 	dw nastav_pozici_v_souboru			; 42h
- 	dw pomocna_atributy_souboru   		; 43h
- 	dw 0								; 44h
- 	dw 0								; 45h
- 	dw 0								; 46h
- 	dw ziskej_nazev_aktualniho_adresare ; 47h
- 	times 13 dw 0						; 48h - 55h
- 	dw prejmenuj_soubor					; 56h
- 	dw pomocna_casovy_udaj_o_souboru	; 57h
 
 boot_sektor:							; bootovaci sektor fatky zarovnany na 512 bytu
 	times 3 db 0						; program
