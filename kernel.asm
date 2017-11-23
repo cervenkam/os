@@ -186,25 +186,18 @@ pocitadlo:
 	db 17                        ; pocitadlo - kdyz dojede na 0, prekresli se hodiny a restartuje se na 17
 
 break:
-	cli                  ; zacatek obsluhy preruseni stisku klavesy PrtSc - ukonceni programu, nejprve zakazeme preruseni
-	pop ax               ; vybereme offset navratove adresy z preruseni
-	pop ax               ; vybereme i segment navratove adresy z preruseni
-	push cs              ; vlozime aktualni segment jako navratovy segment (ukonceni programu = skok na cs:po_logu)
-	push po_logu         ; a vlozime i offset, kam se ma vykonavani vratit
-	mov bp,sp            ; nastavime base pointer na stack pointer - vycistime tim zasobnik
-	pusha                ; ulozime stav vsech registru
-	pushf                ; ulozime FLAGy pro nasledujici call (ten vola iret, takze obnovuje tyto flagy)
-	call 0xf000:0xff54   ; volani puvodni obsluhy preruseni
-	popa                 ; obnova vsech registru
-        iret                 ; a ukonceni obsluhy preruseni
+	cli                           ; zacatek obsluhy preruseni stisku klavesy PrtSc - ukonceni programu, nejprve zakazeme preruseni
+	mov bp,sp                     ; nastavime base pointer na stack pointer
+	mov word [ss:bp],po_logu      ; nastavime navratovy offset na navesti "po_logu"
+	mov word [ss:bp+2],cs         ; nastavime navratovy segment na kodovy segment
+        iret                          ; a ukonceni obsluhy preruseni
 
 spustit_program:
-	cli       ; zacatek obsluhy preruseni - prepnuti programu na ES:AX
-	pop dx    ; vybereme navratovy offset, ten zahodime
-	pop dx    ; vybereme navratovy segment, ten take zahodime
-	push es   ; misto nej vlozime vlastni segment
-	push ax   ; i offset
-        iret      ; a ukoncime obsluhu preruseni
+	cli                           ; zacatek obsluhy preruseni - prepnuti programu na ES:AX
+	mov bp,sp                     ; nastavime base pointer na stack pointer
+	mov word [ss:bp],ax           ; nastavime navratovy offset na navesti "po_logu"
+	mov word [ss:bp+2],es         ; nastavime navratovy segment na kodovy segment
+        iret                          ; a ukoncime obsluhu preruseni
 
 %include "splash.asm"             ; vlozeni nacitaci obrazovky
 ;zacne hazet chybu pri rostoucim kodu, proto pak zvysit ale
