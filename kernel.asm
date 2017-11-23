@@ -176,10 +176,6 @@ interrupt:
 	mov byte [cs:pocitadlo],17   ; a restartujeme pocitadlo
 pokracuj_interrupt:
 	dec byte [cs:pocitadlo]      ; snizime pocitadlo o 1
-	push ax
-	mov al,0x20
-	out 0x20,al
-	pop ax
 	popa                         ; obnovime vsechny stavove registry
 	iret                         ; a ukoncime obsluhu preruseni
 pocitadlo:
@@ -190,6 +186,8 @@ break:
 	mov bp,sp                     ; nastavime base pointer na stack pointer
 	mov word [ss:bp],po_logu      ; nastavime navratovy offset na navesti "po_logu"
 	mov word [ss:bp+2],cs         ; nastavime navratovy segment na kodovy segment
+	mov al,0x20                   ; do AL vlozime 20
+	out 0x20,al                   ; a oznamime PIC, ze jsme s obsluhou hotovi
         iret                          ; a ukonceni obsluhy preruseni
 
 spustit_program:
