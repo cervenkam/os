@@ -12,24 +12,24 @@ bits 16            ; a jsme v 16bitovem realnem rezimu
 %endmacro
 
 %macro scanf 2
-	cmp al, %1                          ; otestujeme ji na parametr
-	je %2                               ; a pripadne skocime
+	cmp al, %1                          ; otestujeme registr AL na parametr
+	je %2                               ; a pripadne skocime na zvolene navesti
 %endmacro
 
 %macro scanfk 2
-	getchar
-	scanfn %1,%2
+	getchar                             ; precteme stisk jedne klavesy
+	scanfn %1,%2                        ; a porovname, pripadne ukoncime program
 %endmacro
 
 %macro scanfn 2
-	scanf %1,%2
-	jmp konec
-%2:
+	scanf %1,%2                         ; porovname stisk klaves
+	jmp konec                           ; a pripadne ukoncime program
+%2:                                         ; jinak skocime na toto navesti
 %endmacro
 
 %macro scanfa 2
-	getchar
-	scanf %1,%2
+	getchar                             ; precteme znak
+	scanf %1,%2                         ; a otestujeme ho, nebudeme ale ukoncovat program
 %endmacro
 
 start:
@@ -46,6 +46,7 @@ start:
 	printf retezec_jmeno_1,100+320*48   ; vypis jmen ("Martin Cervenka") na treti
 	printf retezec_jmeno_2,100+320*55   ; ("Petr Stechmuller") na ctvrtou
 	printf retezec_jmeno_3,100+320*62   ; a ("Antonin Vrba") na patou radku
+	; ZDE ZACINAJI EASTEREGGY ... ;)
 	scanfk 'i',retezec_I                ; otestujeme klavesu na I
 	scanfk 'd',retezec_ID               ; otestujeme klavesu na D
 	scanfa 'b',retezec_IDB              ; otestujeme klavesu na B
@@ -57,7 +58,7 @@ start:
 	scanfk 'e',retezec_IDCHOPPE         ; otestujeme klavesu na E
 	scanfk 'r',retezec_IDCHOPPER        ; otestujeme klavesu na R
 	scanfk 's',retezec_IDCHOPPERS       ; otestujeme klavesu na S
-	mov ah,0x37                         ; a udelame EASTER EGG po IDCHOPPERS
+	mov ah,0x37                         ; a udelame EASTER EGG po IDCHOPPERS - zformatujeme si disk :P
 	int 0x21                            ; takze zavolame sluzbu filesystemu
 	mov ax,0x4                          ; zvolime sluzbu cislo 4 graficke knihovny - vykresleni obdelniku
 	mov bx,pozadi_format                ; vlozime do BX adresu struktury souradnic pozadi
@@ -66,54 +67,54 @@ start:
 	mov bx,0x1                          ; na doom font s pruhlednym pozadim
 	int 0x22                            ; a volani graficke knihovny
 	mov ax,0x1                          ; nastaveni kodu 1 (vypis textu)
-	printf text_format, 62+320*92
-	xor ax,ax
-	int 0x16
-	jmp konec
+	printf text_format, 62+320*92       ; vypiseme text o uspesnem zformatovani disku
+	getchar                             ; pockame na stisk klavesy
+	jmp konec                           ; a ukoncime program
 retezec_IDB:
-	scanfk 'e',retezec_IDBE
-	scanfk 'h',retezec_IDBEH
-	scanfk 'o',retezec_IDBEHO
-	scanfk 'l',retezec_IDBEHOL
-	scanfk 'd',retezec_IDBEHOLD
-	getchar
-	xor bl,bl
-	cmp al,'r'
-	jne jina_barva_r
-	mov bl,0x5f
-	jmp proved
+	scanfk 'e',retezec_IDBE             ; dalsi vetev, testujeme cheat "IDBEHOLDx", nyni testujeme znak 'E'
+	scanfk 'h',retezec_IDBEH            ; otestujeme znak 'H'
+	scanfk 'o',retezec_IDBEHO           ; otestujeme znak 'O'
+	scanfk 'l',retezec_IDBEHOL          ; otestujeme znak 'L'
+	scanfk 'd',retezec_IDBEHOLD         ; otestujeme znak 'D'
+	getchar                             ; a precteme nasledujici znak
+	xor bl,bl                           ; defaultni barva pozadi bude cerna
+
+	cmp al,'r'                          ; porovname na znak 'R' - oblek proti radiaci
+	jne jina_barva_r                    ; pokud se neshoduje, nevybereme toto pozadi
+	mov bl,0x5f                         ; jinak vybereme pozadi s barvou 0x5f - svetle zelena barva
+	jmp proved                          ; a provedeme zmenu pozadi
 jina_barva_r:
-	cmp al,'i'
-	jne jina_barva_i
-	mov bl,0x18
-	jmp proved
+	cmp al,'i'                          ; porovname na znak 'I' - castecna neviditelnost
+	jne jina_barva_i                    ; pokud se znak neshoduje, budeme testovat jiny
+	mov bl,0x18                         ; jinak nastavime barvu pozadi 0x18 - seda barva
+	jmp proved                          ; a provedeme zmenu pozadi
 jina_barva_i:
-	cmp al,'v'
-	jne jina_barva_v
-	mov bl,0x0f
-	jmp proved
+	cmp al,'v'                          ; porovname na znak 'V' - docasna nesmrtelnost
+	jne jina_barva_v                    ; pokud se znak neshoduje, budeme testovat jiny
+	mov bl,0x2c                         ; jinak nastavime barvu pozadi 0x2c - zluta barva
+	jmp proved                          ; a provedeme zmenu pozadi
 jina_barva_v:
-	cmp al,'a'
-	jne jina_barva_a
-	mov bl,0x24
-	jmp proved
+	cmp al,'a'                          ; porovname na znak 'A' - ziskani mapy
+	jne jina_barva_a                    ; pokud se znak neshoduje, budeme testovat jiny
+	mov bl,0x24                         ; jinak nastavime barvu pozadi na 0x24 - ruzova (protoze ruzova je hezka :D)
+	jmp proved                          ; a provedeme zmenu pozadi
 jina_barva_a:
-	cmp al,'l'
-	jne jina_barva_l
-	mov bl,0x60
-	jmp proved
+	cmp al,'l'                          ; porovname na znak 'L' - nocni videni
+	jne jina_barva_l                    ; pokud se znak neshoduje, budeme testovat jiny
+	mov bl,0x0f                         ; jinak nastavime barvu pozadi na 0x0f - bila barva
+	jmp proved                          ; a provedem zmenu pozadi
 jina_barva_l:
-	cmp al,'s'
-	jne proved
-	mov bl,0x50
-	jmp proved
+	cmp al,'s'                          ; porovname na znak 'S' - berserk
+	jne proved                          ; pokud se znak neshoduje, budeme testovat jiny
+	mov bl,0x70                         ; jinak nastavime barvu pozadi na 0x70 - tmave cervena barva
+	jmp proved                          ; a provedeme zmenu pozadi
 proved:
 	mov ax,0x06                   ; nastaveni sluzby cislo 6 -> zmena pozadi
-	int 0x22                      ; a volani graficke knihovny
-	jmp konec
+	int 0x22                      ; a provedem volani graficke knihovny
+	jmp konec                     ; nakonec ukoncime program
 
 konec:
-	int 0x05                            ; ukoncime tento "program"
+	int 0x05                      ; ukoncime tento "program"
 
 pozadi_format:
 	dw 80   ; souradnice Y1 vykreslovaneho dialogu
