@@ -44,6 +44,8 @@ po_logu:
 	
 	xor ax,ax       ; nastaveni sluzby 0 graficke knihovny - nastaveni video modu
 	int 0x22        ; provedeni prepnuti do video modu
+	mov ax,0x05     ; nastaveni sluzby 5 graficke knihovny - vyplneni pozadi
+	int 0x22        ; provedeni vykresleni pozadi
 	mov ax,0x02     ; nastaveni sluzby 2 graficke knihovny - nastaveni fontu
 	xor bx,bx       ; vyber fontu - zakladni (maly, modry font)
 	int 0x22        ; provedeni prepnuti fontu

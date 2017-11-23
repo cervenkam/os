@@ -6,11 +6,30 @@ bits 16            ; a jsme v 16bitovem realnem rezimu
 	int 0x22   ; a volani graficke knihovny
 %endmacro
 
-%macro scanf 1
+%macro getchar 0
 	xor ax,ax                           ; kodem 0
 	int 0x16                            ; budeme cekat na stisknutou klavesu
-	cmp al, %1                         ; otestujeme ji na parametr
-	jne konec                           ; a pripadne skoncime
+%endmacro
+
+%macro scanf 2
+	cmp al, %1                          ; otestujeme ji na parametr
+	je %2                               ; a pripadne skocime
+%endmacro
+
+%macro scanfk 2
+	getchar
+	scanfn %1,%2
+%endmacro
+
+%macro scanfn 2
+	scanf %1,%2
+	jmp konec
+%2:
+%endmacro
+
+%macro scanfa 2
+	getchar
+	scanf %1,%2
 %endmacro
 
 start:
@@ -27,16 +46,17 @@ start:
 	printf retezec_jmeno_1,100+320*48   ; vypis jmen ("Martin Cervenka") na treti
 	printf retezec_jmeno_2,100+320*55   ; ("Petr Stechmuller") na ctvrtou
 	printf retezec_jmeno_3,100+320*62   ; a ("Antonin Vrba") na patou radku
-	scanf 'i'                           ; otestujeme klavesu na I
-	scanf 'd'                           ; otestujeme klavesu na D
-	scanf 'c'                           ; otestujeme klavesu na C
-	scanf 'h'                           ; otestujeme klavesu na H
-	scanf 'o'                           ; otestujeme klavesu na O
-	scanf 'p'                           ; otestujeme klavesu na P
-	scanf 'p'                           ; otestujeme klavesu na P
-	scanf 'e'                           ; otestujeme klavesu na E
-	scanf 'r'                           ; otestujeme klavesu na R
-	scanf 's'                           ; otestujeme klavesu na S
+	scanfk 'i',retezec_I                ; otestujeme klavesu na I
+	scanfk 'd',retezec_ID               ; otestujeme klavesu na D
+	scanfa 'b',retezec_IDB              ; otestujeme klavesu na B
+	scanfn 'c',retezec_IDC              ; otestujeme klavesu na C
+	scanfk 'h',retezec_IDCH             ; otestujeme klavesu na H
+	scanfk 'o',retezec_IDCHO            ; otestujeme klavesu na O
+	scanfk 'p',retezec_IDCHOP           ; otestujeme klavesu na P
+	scanfk 'p',retezec_IDCHOPP          ; otestujeme klavesu na P
+	scanfk 'e',retezec_IDCHOPPE         ; otestujeme klavesu na E
+	scanfk 'r',retezec_IDCHOPPER        ; otestujeme klavesu na R
+	scanfk 's',retezec_IDCHOPPERS       ; otestujeme klavesu na S
 	mov ah,0x37                         ; a udelame EASTER EGG po IDCHOPPERS
 	int 0x21                            ; takze zavolame sluzbu filesystemu
 	mov ax,0x4                          ; zvolime sluzbu cislo 4 graficke knihovny - vykresleni obdelniku
@@ -49,6 +69,49 @@ start:
 	printf text_format, 62+320*92
 	xor ax,ax
 	int 0x16
+	jmp konec
+retezec_IDB:
+	scanfk 'e',retezec_IDBE
+	scanfk 'h',retezec_IDBEH
+	scanfk 'o',retezec_IDBEHO
+	scanfk 'l',retezec_IDBEHOL
+	scanfk 'd',retezec_IDBEHOLD
+	getchar
+	xor bl,bl
+	cmp al,'r'
+	jne jina_barva_r
+	mov bl,0x5f
+	jmp proved
+jina_barva_r:
+	cmp al,'i'
+	jne jina_barva_i
+	mov bl,0x18
+	jmp proved
+jina_barva_i:
+	cmp al,'v'
+	jne jina_barva_v
+	mov bl,0x0f
+	jmp proved
+jina_barva_v:
+	cmp al,'a'
+	jne jina_barva_a
+	mov bl,0x24
+	jmp proved
+jina_barva_a:
+	cmp al,'l'
+	jne jina_barva_l
+	mov bl,0x60
+	jmp proved
+jina_barva_l:
+	cmp al,'s'
+	jne proved
+	mov bl,0x50
+	jmp proved
+proved:
+	mov ax,0x06                   ; nastaveni sluzby cislo 6 -> zmena pozadi
+	int 0x22                      ; a volani graficke knihovny
+	jmp konec
+
 konec:
 	int 0x05                            ; ukoncime tento "program"
 

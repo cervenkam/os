@@ -20,19 +20,28 @@ tabulka_skoku:
 	dw zobraz_hodiny               ; obsluha sluzby 0x03 -> zobrazeni hodin
 	dw vypln_obdelnik              ; obsluha sluzby 0x04 -> vyplneni obdelniku
 	dw vypln_obrazovku             ; obsluha sluzby 0x05 -> vyplneni cele obrazovky
+	dw zmen_pozadi                 ; obsluha sluzby 0x06 -> zmena pozadi
+zmen_pozadi:
+	mov [cs:barva_pozadi],bl       ; nastaveni pozadi na barvu predanou pres BL
+	ret                            ; ukonceni podprogramu
+
+barva_pozadi:
+	db 0        ; defaultni barva pozadi je 0
+
 vypln_obrazovku:
-	pusha                          ; ulozeni vsech registru na zasobnik
-	push es                        ; ulozeni extra segmentu na zasobnik, ten si pak nastavime na segment video pameti
-	mov ax,0xa000                  ; nastaveni AX na segment video pameti
-	mov es,ax                      ; presun segmentu video pameti do extra segmentu
-	mov cx,SIRKA_OKNA*VYSKA_OKNA   ; nastaveni ridici promenne cyklu na pocet pixelu v okne
+	pusha                            ; ulozeni vsech registru na zasobnik
+	push es                          ; ulozeni extra segmentu na zasobnik, ten si pak nastavime na segment video pameti
+	mov ax,0xa000                    ; nastaveni AX na segment video pameti
+	mov es,ax                        ; presun segmentu video pameti do extra segmentu
+	mov cx,SIRKA_OKNA*VYSKA_OKNA     ; nastaveni ridici promenne cyklu na pocet pixelu v okne
 	vyplneni_smycka:
-		mov bx,cx              ; zkopirovani ridici promenne do BX pro indexaci
-		mov byte [es:bx],0     ; vynulovani aktualniho pixelu
-		loop vyplneni_smycka   ; a opakovani smycky
-	pop es                         ; obnova extra segmentu
-	popa                           ; obnova vsech ostatnich registru
-	ret                            ; a navrat z podprogramu
+		mov bx,cx                ; zkopirovani ridici promenne do BX pro indexaci
+		mov al,[cs:barva_pozadi] ; nastaveni barvy pozadi
+		mov byte [es:bx],al      ; vykresleni aktualniho pixelu
+		loop vyplneni_smycka     ; a opakovani smycky
+	pop es                           ; obnova extra segmentu
+	popa                             ; obnova vsech ostatnich registru
+	ret                              ; a navrat z podprogramu
 vypln_obdelnik:
 	pusha                                       ; nejprve si ulozime stavy registru na zasobnik
 	push es                                     ; a take extra segment
@@ -205,6 +214,10 @@ text_zobraz_znak:
 			mov al,[cs:si]               ; do AL precteme aktualni pixel fontu
 			cmp al,[cs:bx+2]             ; a tento pixel porovname s transparentni barvou
 			je text_pokracuj             ; a pokud jsou stejne, nebudeme pixel kopirovat
+			test al,al                   ; otestujeme, jestli barva neni 0
+			jnz kresli_pixel             ; pokud neni, nebudeme delat korekci
+			mov al,[cs:barva_pozadi]     ; jinak tuto barvu zmenime na barvu pozadi
+			kresli_pixel:
 				add al,[cs:bx+9]     ; jinak k AL pridani konstantni barvu (lze s ni menit barvu fontu)
 				mov [es:di],al       ; a do video pameti vlozime dany pixel
 			text_pokracuj:
