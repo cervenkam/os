@@ -4,10 +4,10 @@ Minimalistic Operating System - **FailOS**
 
 <img src="https://download.hornet-cz.com/public/FailOS.png" width="250px"/>
 
+
 ## Installation
 
-For compilation use **nasm** (working with version 2.13.01)
-For run you will have to install **qemu** (**qemu-system-x86\_64**, working with  2.10.1)
+For compilation use **nasm** (working with version 2.13.01) and you will have to install **qemu** (qemu-system-x86\_64, working with version 2.10.1)
 
 ## Run
 
@@ -31,3 +31,12 @@ In project directory do **make** and praise the KEK
 * Petr &Scaron;techm&uuml;ller
 * Anton&iacute;n Vrba
 * Martin &Ccaron;ervenka
+
+<img src="https://download.hornet-cz.com/public/fos_menu.png" width="300px"/>
+<img src="https://download.hornet-cz.com/public/fos_browser.png" width="300px"/>
+<img src="https://download.hornet-cz.com/public/editor_save.png" width="300px"/>
+<img src="https://download.hornet-cz.com/public/game.png" width="300px"/>
+<img src="https://download.hornet-cz.com/public/info.png" width="300px"/>
+
+
+
