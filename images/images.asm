@@ -293,30 +293,36 @@ doomfaces_pozice:
 ; CL - minuty
 ; DH - sekundy
 ziskej_hodiny:
-	push ax
-	push bx
-	push dx
-	push es
-	mov ax,0x0040
-	mov es,ax
-	xor ax,ax
-	mov dx,[es:0x006c]
-	mov cx,[es:0x006e]
-	pop es
-	; az sem je to OK
-	mov bx,dx
-	mov ax,cx
-	push bx
-	mov bx,540
-	mul bx
-	pop bx
-	mov cx,ax
-	mov ax,bx
-	push bx
-	mov bx,540
-	mul bx
-	pop bx
-	add cx,dx
+	; vypocet ktery jsem v afektu provedl na papir, vlozil bez kompilace na github
+	; pak otestoval a fungoval, aktualne presne nevim, co se zde deje...
+	; zjistil jsem, ze kdyz pocet ticku prenasobim konstantou 1080/19663, vyjde
+	; pocet sekund, jenze ten se nevejde do 16ti bitoveho registru (sekund za den je 86400,
+	; do 16tibitoveho registru se vejde pouze 65536 sekund), proto jsem se rozhodl,
+	; ze budu pocitat pocet "dvousekund" za den - hodiny proto budou citat po dvou sekundach
+	; a pocet ticku budu prenasobovat hodnotou 540/19663
+	push ax                ; ulozime si AX na zasobnik
+	push bx                ; ulozime si i BX na zasobnik
+	push dx                ; a i DX na zasobnik
+	push es                ; nakonec i extra segment
+	mov ax,0x0040          ; do AX vlozime adresu 0x0040 (segment, kde lezi pocet "ticku" od zacatku dne)
+	mov es,ax              ; a tento segment presuneme do extra segmentu
+	xor ax,ax              ; vynulujeme AX
+	mov dx,[es:0x006c]     ; nacteme horni pocet tiku do DX 
+	mov cx,[es:0x006e]     ; a spodni do CX (tiky nyni jsou v DX:CX)
+	pop es                 ; obnovime extra segment
+	mov bx,dx              ; zalohujeme si DX do BX
+	mov ax,cx              ; a CX do AX (tiky jsou nyni bud v DX nebo BX:CX nebo AX)
+	push bx                ; ulozime BX na zasobnik
+	mov bx,1080             ; do BX vlozime 540 (nasobici konstanta, viz komentar na zacatku kodu)
+	mul bx                 ; a touto hodnotou prenasobime AX (vysledek v DX:AX)
+	pop bx                 ; obnovime BX (ticky jsou nyni pouze v BX:CX)
+	mov cx,ax              ; presuneme AX do CX (jiz nemame spodni cast ticku)
+	mov ax,bx              ; a do AX vlozime horni cast ticku
+	push bx                ; ulozime BX (horni cast ticku) na zasobnik
+	mov bx,1080             ; do BX vlozime 540 (nasobici konstatna, viz komentar na zacatku kodu)
+	mul bx                 ; touto konstantou prenasobime AX (horni cast ticku)
+	pop bx                 ; a obnovime horni cast ticku do BX
+	add cx,dx              ; pridame do CX 
 	mov dx,cx
 	push bx
 	mov bx,19663
@@ -324,12 +330,9 @@ ziskej_hodiny:
 	xor dx,dx
 	pop bx
 	mov bx,ax
-	mov cx,30
+	mov cx,60
 	div cx
-	shl dx,1
-	;mov cx,[es:0x006c]
-	;and cx,1
-	;add dx,cx
+	;shl dx,1
 	mov cx,60
 	push dx
 	xor dx,dx
