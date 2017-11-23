@@ -1,41 +1,38 @@
 bits 16
 org 0
 %define SIRKA_OKNA 320
-; nastavi video mod, bez parametru
+%define VYSKA_OKNA 200
 video_preruseni:
-	cli
-	push dx
-	push bx
-	mov bx,ax
-	shl bx,1
-	mov dx,[cs:tabulka_skoku+bx]
-	pop bx
-	call dx
-	pop dx
-	iret
+	cli                            ; obsluha preruseni 0x22 graficke knihovny, nejprve zakazeme preruseni
+	push dx                        ; ulozime registr DX
+	push bx                        ; a BX na zasobnik
+	mov bx,ax                      ; prekopiruje AX do BX, aby bylo mozne s nim indexovat (v AX je cislo sluzby)
+	shl bx,1                       ; vynasobime ho 2 (16ti bitova adresace)
+	mov dx,[cs:tabulka_skoku+bx]   ; a najdeme adresu obsluhy dane sluzby dle vstupniho parametru AX
+	pop bx                         ; obnovime BX pro obsluhu sluzby
+	call dx                        ; a zavolame tuto obsluhu
+	pop dx                         ; nakonec obnovime DX
+	iret                           ; a ukoncime obsluhu preruseni
 tabulka_skoku:
-	dw text_nastavit_video_mod
-	dw text_zobrazit
-	dw text_nastavit_font
-	dw zobraz_hodiny
-	dw vypln_obdelnik
-	dw vypln_obrazovku
+	dw text_nastavit_video_mod     ; obsluha sluzby 0x00 -> nastaveni video modu
+	dw text_zobrazit               ; obsluha sluzby 0x01 -> vykresleni textu
+	dw text_nastavit_font          ; obsluha sluzby 0x02 -> nastaveni fontu
+	dw zobraz_hodiny               ; obsluha sluzby 0x03 -> zobrazeni hodin
+	dw vypln_obdelnik              ; obsluha sluzby 0x04 -> vyplneni obdelniku
+	dw vypln_obrazovku             ; obsluha sluzby 0x05 -> vyplneni cele obrazovky
 vypln_obrazovku:
-	pusha
-	push ds
-	mov ax,cs
-	mov ds,ax
-	mov bx,obrazovka
-	call vypln_obdelnik
-	pop ds
-	popa
-	ret
-obrazovka:
-	dw 0
-	dw 320
-	dw 0
-	dw 200
-	db 0
+	pusha                          ; ulozeni vsech registru na zasobnik
+	push es                        ; ulozeni extra segmentu na zasobnik, ten si pak nastavime na segment video pameti
+	mov ax,0xa000                  ; nastaveni AX na segment video pameti
+	mov es,ax                      ; presun segmentu video pameti do extra segmentu
+	mov cx,SIRKA_OKNA*VYSKA_OKNA   ; nastaveni ridici promenne cyklu na pocet pixelu v okne
+	vyplneni_smycka:
+		mov bx,cx              ; zkopirovani ridici promenne do BX pro indexaci
+		mov byte [es:bx],0     ; vynulovani aktualniho pixelu
+		loop vyplneni_smycka   ; a opakovani smycky
+	pop es                         ; obnova extra segmentu
+	popa                           ; obnova vsech ostatnich registru
+	ret                            ; a navrat z podprogramu
 vypln_obdelnik:
 	pusha
 	push es

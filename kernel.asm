@@ -157,7 +157,7 @@ retezec_hra:
 retezec_info:
 	db "Info",0              ; retezec infa
 verze:
-	db "Verze OS: 1.0.2", 0  ; retezec verze OS
+	db "Verze OS: 1.0.3", 0  ; retezec verze OS
 konec:
 	int 0x05                 ; konec tohoto programu - NEMEL BY NIKDY NASTAT ;/
 interrupt:
