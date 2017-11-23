@@ -49,7 +49,8 @@ start:
 	; ZDE ZACINAJI EASTEREGGY ... ;)
 	scanfk 'i',retezec_I                ; otestujeme klavesu na I
 	scanfk 'd',retezec_ID               ; otestujeme klavesu na D
-	scanfa 'b',retezec_IDB              ; otestujeme klavesu na B
+	scanfa 'd',retezec_IDD              ; otestujeme klavesu na D
+	scanf  'b',retezec_IDB              ; otestujeme klavesu na B
 	scanfn 'c',retezec_IDC              ; otestujeme klavesu na C
 	scanfk 'h',retezec_IDCH             ; otestujeme klavesu na H
 	scanfk 'o',retezec_IDCHO            ; otestujeme klavesu na O
@@ -70,6 +71,19 @@ start:
 	printf text_format, 62+320*92       ; vypiseme text o uspesnem zformatovani disku
 	getchar                             ; pockame na stisk klavesy
 	jmp konec                           ; a ukoncime program
+retezec_IDD:
+	scanfk 'q',retezec_IDDQ             ; otestujeme klavesu na Q
+	scanfk 'd',retezec_IDDQD            ; otestujeme klavesu na D
+	mov ax,0x06                         ; nastaveni sluzby cislo 6 -> zmena pozadi
+	int 0x22                            ; a provedem volani graficke knihovny (v BL je barva puvodniho pozadi)
+	mov bh,0x2c                         ; budeme predpokladat, ze nastavime barvu nesmrtelnosti
+	cmp bl,bh                           ; byla jiz nesmrtelnost?
+	jne nastavit_iddqd                  ; nastavi se nesmrtelnost, pokud jeste nastavena nebyla
+	xor bh,bh                           ; jinak se nastavi barva pozadi na 0
+nastavit_iddqd:
+	mov bl,bh                           ; presune se barva pozadi do BL
+	int 0x22                            ; a zavola se graficka knihovna
+	jmp konec                           ; nakonec se ukonci program
 retezec_IDB:
 	scanfk 'e',retezec_IDBE             ; dalsi vetev, testujeme cheat "IDBEHOLDx", nyni testujeme znak 'E'
 	scanfk 'h',retezec_IDBEH            ; otestujeme znak 'H'

@@ -22,7 +22,9 @@ tabulka_skoku:
 	dw vypln_obrazovku             ; obsluha sluzby 0x05 -> vyplneni cele obrazovky
 	dw zmen_pozadi                 ; obsluha sluzby 0x06 -> zmena pozadi
 zmen_pozadi:
+	mov dl,[cs:barva_pozadi]       ; nacteni puvodni barvy pozadi do DL
 	mov [cs:barva_pozadi],bl       ; nastaveni pozadi na barvu predanou pres BL
+	mov bl,dl                      ; a prepsani BL na puvodni barvu - volany muze vedet, jaka byla puvodni barva
 	ret                            ; ukonceni podprogramu
 
 barva_pozadi:
