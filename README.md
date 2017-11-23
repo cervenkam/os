@@ -2,7 +2,7 @@
 
 Minimalistic Operating System - **FailOS** 
 
-<img src="https://download.hornet-cz.com/public/FailOS.png" alt="Drawing" style="width: 200px;"/>
+<img src="https://download.hornet-cz.com/public/FailOS.png" width="250px"/>
 
 ## Installation
 
