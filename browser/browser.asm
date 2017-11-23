@@ -158,11 +158,11 @@ nemenit_pozadi:
 	mov ah,[cs:nacteny_buffer+bx+0x1e]   ; precteme horni bajt velikosti vykreslovaneho souboru
 	mov al,[cs:nacteny_buffer+bx+0x1f]   ; precteme dolni bajt velikosti vykreslovaneho souboru - velikost je nyni v AX
 	xor dx,dx                            ; vycistime DX
-	mov cx,102                           ; do CX vlozime 102 (mame 512 bajtu max. velikost souboru a 5 obliceju => 512/5 ~= 102)
+	mov cx,102                           ; do CX vlozime 102 (mame 512 bajtu max. velikost souboru a 5 obliceju (6ty je zvlast) => 512/5 ~= 102)
 	div cx                               ; a vydelime AX/CX, ziskame index obliceje v AX
-	cmp al,5                             ; porovname AL na 5 (vice nez 5 obliceju neni, ochrana proti preteceni)
+	cmp al,5                             ; porovname AL na 5 (vice nez 6 obliceju neni, ochrana proti preteceni)
 	jle neopravuj_al                     ; pokud jsme <=5, je to dobre, nemusime index opravovat
-	mov al,5                             ; jinak ho opravime na 5, provedli jsme vlastne "index = min(index,5)"
+	mov al,5                             ; jinak ho opravime na 5 (oblicej "smrti" - plny soubor), provedli jsme vlastne "index = min(index,5)"
 neopravuj_al:
 	add [cs:znak],al                     ; pricteme vypocitany index obliceje k znaku
 	mov ax,0x2                           ; nastavime sluzbu graficke knihovny na 2 - nastaveni fontu
