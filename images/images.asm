@@ -326,10 +326,10 @@ ziskej_hodiny:
 	jl neopravuj_hodiny        ; pokud ne, nebudou se hodiny opravovat
 	cmp cx,0xc                 ; test, jestli nejsme s horni casti pres - bude urcite odpoledne
 	jg urcite_oprav_hodiny     ; skocime na opravu hodin
-	cmp dx,0x54                ; porovnani, jestli neni odpoledne podle spodni casti, horni cast nam nic neprozradila
+	cmp dx,0x58                ; porovnani, jestli neni odpoledne podle spodni casti, horni cast nam nic neprozradila
 	jl neopravuj_hodiny        ; pokud neni, nebudou se hodiny opravovat
 urcite_oprav_hodiny:
-	sub dx,0x54                ; odecteme dopoledne od hodin v horni casti ticku
+	sub dx,0x58                ; odecteme dopoledne od hodin v horni casti ticku
 	sbb cx,0xc                 ; odecteme dopoledne od hodin a i v dolni casti ticku (a spolu s borrow flagem)
 	mov byte [cs:odpoledne],12 ; nastavime, ze je odpoledne
 neopravuj_hodiny:
