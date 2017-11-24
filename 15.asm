@@ -45,6 +45,8 @@ stisk_klavesy:
 	je sipka_vpravo      ; obsluha klavesy "sipka vpravo"
 	cmp ah,0x50          ; porovnani scankodu na sipku dolu
 	je sipka_dolu        ; obsluha klavesy "sipka dolu"
+	cmp ah,0x01          ; dale testujeme escape na ukonceni hry
+	je konec             ; a pripadne ukoncime hru
 	jmp stisk_klavesy    ; pokud neni klavesa rozpoznana, bude se cist znova
 sipka_nahoru:
 	cmp bx,4             ; porovnani prazdne pozice se 4kou

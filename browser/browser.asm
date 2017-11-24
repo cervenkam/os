@@ -46,6 +46,8 @@ stisk_klavesy:
 	je sipka_dolu                        ; provedeni presunu dolu v menu prohlizece, pokud byla stisknuta klavesa "sipka dolu"
 	cmp ah,0x1C                          ; porovnani scankodu stisknute klavesy na hodnotu 0x1C, ktery odpovida enteru
 	je enter                             ; provedeni vyberu souboru, byl-li stiknut enter
+	cmp ah,0x01                          ; dale testujeme escape na ukonceni prohllizece
+	je konec                             ; a pripadne ukoncime prohlizec
 	jmp stisk_klavesy                    ; jinak cteme jinou klavesu
 sipka_do_strany:
 	mov al,[cs:aktualni_soubor]          ; nacteme si ID aktualniho souboru
