@@ -4,7 +4,7 @@
 %define segment_filesystem 0x2000
 %define velikost_filesystem 6
 %define segment_editor 0x3000
-%define velikost_editor 4
+%define velikost_editor 2
 %define segment_prohlizec 0x4000
 %define velikost_prohlizec 3
 %define segment_hra 0x5000
@@ -13,6 +13,8 @@
 %define velikost_obrazky 29
 %define segment_info 0x5800
 %define velikost_info 1
+%define segment_menu 0x6000
+%define velikost_menu 2
 
 ;nemenit nasledujici definice:
 %define start_jadro 2
@@ -22,6 +24,7 @@
 %define start_prohlizec (start_editor+velikost_editor)
 %define start_hra (start_prohlizec+velikost_prohlizec)
 %define start_obrazky (start_hra+velikost_hra)
+%define start_menu (start_obrazky+velikost_obrazky)
 %define jadro start_jadro*256+velikost_jadro
 %define info start_info*256+velikost_info
 %define filesystem start_filesystem*256+velikost_filesystem
@@ -29,3 +32,4 @@
 %define prohlizec start_prohlizec*256+velikost_prohlizec
 %define hra start_hra*256+velikost_hra
 %define obrazky start_obrazky*256+velikost_obrazky
+%define menu start_menu*256+velikost_menu

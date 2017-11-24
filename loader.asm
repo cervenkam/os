@@ -48,6 +48,12 @@ nacteni_sektoru:
 	mov ax,obrazky            ; informace o sektorech obrazky
 	mov bx,segment_obrazky    ; informace o segmentu obrazku
 	call nacti_segmenty       ; nacteni sektoru do pameti
+	jc restart                ; a pokud se to nezdari, restartuj menu
+	mov ax,menu               ; informace o sektorech menu
+	mov bx,segment_menu       ; informace o segmentu menu
+	call nacti_segmenty       ; nacteni sektoru do pameti
+	mov ax,zprava_restart     ; nastaveni vypisovaneho retezce na zpravu o restartu
+	call pis16                ; zavolani vypisu retezce restartu
 	jc restart                ; a pokud se to nezdari, restartuj system
 	; konec cteni sektoru
 	jmp skok_jadro            ; skok do nacteneho jadra

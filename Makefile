@@ -5,7 +5,7 @@ run: main.bin
 	# spusteni programu v qemu
 	qemu-system-x86_64 -drive file=main.bin,format=raw -drive file=drive.bin,cache=none,format=raw # -rtc base='2017-11-23T20:00:00'
 # vytvoreni binarniho obrazu OS
-main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin
+main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin menu.bin
 	# k tomu pouzijeme "linker" - proste vlozime dane soubory za sebe
 	cat $^ > $@
 # kompilace jadra FailOSu
@@ -16,6 +16,10 @@ kernel.bin: kernel.asm disk.asm splash.asm
 loader.bin: loader.asm
 	# preklad loaderu FailOSu assemblerem "nasm"
 	nasm -f bin loader.asm -o $@
+# kompilace menu FailOSu
+menu.bin: menu.asm
+	# preklad menu FailOSu assemblerem "nasm"
+	nasm -f bin menu.asm -o $@
 # kompilace programu FailFATky
 filesystem.bin: $(wildcard filesystem/*.asm)
 	# preklad FailFATky assemblerem "nasm"
