@@ -46,6 +46,8 @@ klavesnice:
 	je enter_ulozit            ; takze soubor ulozime, jestli byl enter stisknut
 	cmp ah,0x0e                ; dale testujeme backspace na mazani znaku
 	je backspace               ; a budeme mazat znaky, pokud byl stisknut backspace
+	cmp ah,0x01                ; dale testujeme escape na ukonceni editoru
+	je konec                   ; a pripadne ukoncime editor
 	test al,0xa0               ; nakonec vyhodime vsechny znaky, jejichz ASCII hodnota je >= 0x80
 	jz klavesnice              ; a misto nich radeji budeme cist jine znaky
 	jmp jina_klavesa           ; vsechny ostatni klavesy se pokusime zapsat jako plaintext
