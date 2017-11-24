@@ -70,6 +70,8 @@ menu_smycka:
 	add dx,2                        ; pricteni 2 bajtu (cteme 16ti bitove adresy)
 	jmp menu_smycka                 ; a vykresleni dalsi polozky
 menu_smycka_konec:
+	mov ax,0x03                     ; kod sluzby 3 graficke knihovny, zobrazeni hodin
+	int 0x22                        ; a provedeni zobrazeni hodin
 	xor ax,ax                       ; kod sluzby 0 - cekani na stisk klavesy
 	int 0x16	                ; provedeni cekani na stisk klavesy
 	mov dl,[cs:pozice]              ; nacteni aktualni pozice v menu do DL
