@@ -37,6 +37,7 @@ start:
 	mov ds,ax                           ; do datoveho segmentu
 	mov ax,0x2                          ; nastaveni kodu 2 (zmena fontu)
 	mov bx,0x5                          ; na maly modry font s pruhlednym pozadim
+	xor bl,bl                           ; nebudeme prekreslovat spodni listu
 	int 0x22                            ; a volani graficke knihovny
 	mov ax,0x5                          ; nastaveni kodu 5 (vycisteni obrazovky)
 	int 0x22                            ; a opet volani graficke knihovny
@@ -125,6 +126,8 @@ jina_barva_l:
 proved:
 	mov ax,0x06                   ; nastaveni sluzby cislo 6 -> zmena pozadi
 	int 0x22                      ; a provedem volani graficke knihovny
+	mov ax,0x05                   ; nastavime sluzbu cislo 5 -> prekresleni obrazovky
+	int 0x22                      ; a provedeme volani graficke knihovny
 	jmp konec                     ; nakonec ukoncime program
 
 konec:

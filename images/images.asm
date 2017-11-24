@@ -35,7 +35,10 @@ vypln_obrazovku:
 	push es                          ; ulozeni extra segmentu na zasobnik, ten si pak nastavime na segment video pameti
 	mov ax,0xa000                    ; nastaveni AX na segment video pameti
 	mov es,ax                        ; presun segmentu video pameti do extra segmentu
-	mov cx,SIRKA_OKNA*VYSKA_OKNA     ; nastaveni ridici promenne cyklu na pocet pixelu v okne
+	mov cx,0xed80                    ; nastaveni ridici promenne cyklu na pocet pixelu k spodni liste
+	test bl,bl                       ; otestovani parametru BL
+	jz vyplneni_smycka              ; pokud nebylo BL nastaveno, nebudeme prekreslovat spodni listu
+	mov cx,SIRKA_OKNA*VYSKA_OKNA     ; jinak nastavime vykreslovani na celou obrazovku
 	vyplneni_smycka:
 		mov bx,cx                ; zkopirovani ridici promenne do BX pro indexaci
 		mov al,[cs:barva_pozadi] ; nastaveni barvy pozadi

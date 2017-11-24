@@ -33,6 +33,8 @@ start:
 	mov word [es:0x0022],cs                   ; nastaveni segmentu obsluhy HW preruseni 0x08 (system timer - casovac)
 	pop es                                    ; obnova extra segmentu
 	sti                                       ; povoleni preruseni
+	xor ax,ax       ; nastaveni sluzby 0 graficke knihovny - nastaveni video modu
+	int 0x22        ; provedeni prepnuti do video modu
 
 po_logu:
 	mov ax, cs      ; zkopirovani code segmentu do AX
@@ -42,9 +44,8 @@ po_logu:
 	mov bp, 0x9000  ; nastaveni bazove adresy zasobniku
 	mov sp, bp      ; a ukazatele na aktualni prvek zasobniku (stack pointeru)
 	
-	xor ax,ax       ; nastaveni sluzby 0 graficke knihovny - nastaveni video modu
-	int 0x22        ; provedeni prepnuti do video modu
 	mov ax,0x05     ; nastaveni sluzby 5 graficke knihovny - vyplneni pozadi
+	mov bl,1
 	int 0x22        ; provedeni vykresleni pozadi
 	mov ax,0x02     ; nastaveni sluzby 2 graficke knihovny - nastaveni fontu
 	xor bx,bx       ; vyber fontu - zakladni (maly, modry font)
@@ -159,7 +160,7 @@ retezec_hra:
 retezec_info:
 	db "Info",0              ; retezec infa
 verze:
-	db "Verze OS: 1.0.3", 0  ; retezec verze OS
+	db "Verze OS: 1.0.4", 0  ; retezec verze OS
 konec:
 	int 0x05                 ; konec tohoto programu - NEMEL BY NIKDY NASTAT ;/
 interrupt:

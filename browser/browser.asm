@@ -13,6 +13,7 @@ start:
 	int 0x21                             ; a nacteni dat z FS
 
 	mov ax,5                             ; nastaveni sluzby 5 graficke knihovny - vyplnit pozadi obrazovky
+	xor bl,bl                            ; nebudeme prekreslovat spodni listu
 	int 0x22                             ; provest vyplneni pozadi obrazovky
 	xor cx,cx                            ; vynulovani ridici promenne nasledujiciho cyklu
 	mov bx,660+960+640                   ; nastaveni pocatecni adresy vykreslovani polozek prohlizece

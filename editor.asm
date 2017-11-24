@@ -19,6 +19,7 @@ default_editor:
 
 cisteni:
 	mov ax, 5   ; nastaveni sluzby cislo 5 graficke knihovny - vyplneni pozadi
+	xor bl,bl   ; nebudeme prekreslovat listu
 	int 0x22    ; a volani graficke knihovny
 nastaveni_fontu:
 	mov ax, 2   ; nastaveni sluzby cislo 2 graficke knihovny - nastaveni fontu
