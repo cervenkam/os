@@ -37,12 +37,12 @@ vypln_obrazovku:
 	mov es,ax                        ; presun segmentu video pameti do extra segmentu
 	mov cx,0xed80                    ; nastaveni ridici promenne cyklu na pocet pixelu k spodni liste
 	test bl,bl                       ; otestovani parametru BL
-	jz vyplneni_smycka              ; pokud nebylo BL nastaveno, nebudeme prekreslovat spodni listu
+	jz vyplneni_smycka               ; pokud nebylo BL nastaveno, nebudeme prekreslovat spodni listu
 	mov cx,SIRKA_OKNA*VYSKA_OKNA     ; jinak nastavime vykreslovani na celou obrazovku
 	vyplneni_smycka:
 		mov bx,cx                ; zkopirovani ridici promenne do BX pro indexaci
 		mov al,[cs:barva_pozadi] ; nastaveni barvy pozadi
-		mov byte [es:bx],al      ; vykresleni aktualniho pixelu
+		mov byte [es:bx-1],al    ; vykresleni aktualniho pixelu
 		loop vyplneni_smycka     ; a opakovani smycky
 	pop es                           ; obnova extra segmentu
 	popa                             ; obnova vsech ostatnich registru

@@ -116,7 +116,7 @@ jina_barva_v:
 jina_barva_a:
 	cmp al,'l'                          ; porovname na znak 'L' - nocni videni
 	jne jina_barva_l                    ; pokud se znak neshoduje, budeme testovat jiny
-	mov bl,0x0f                         ; jinak nastavime barvu pozadi na 0x0f - bila barva
+	mov bl,0x01                         ; jinak nastavime barvu pozadi na 0x01 - tmave modra barva
 	jmp proved                          ; a provedem zmenu pozadi
 jina_barva_l:
 	cmp al,'s'                          ; porovname na znak 'S' - berserk
