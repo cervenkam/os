@@ -62,13 +62,15 @@ po_logu:
 	xor dx,dx                       ; vynulovani ridici promenne cyklu menu
 menu_smycka:
 	cmp dx,8                        ; porovnani, jestli jsme vypsali 4 polozky (pocitame po 2, takze 8)
-	je menu_smycka_konec            ; ukonceni v pripade vykresleni celeho menu
+	je menu_smycka_konec_prekresleni; ukonceni v pripade vykresleni celeho menu
 	mov bx,dx                       ; prekopirovani ridici promenne do BX, aby bylo mozne dobre indexovat pamet
 	mov cx,[cs:tabulka_retezcu+bx]  ; nacteni adresy retezce aktualni polozky menu do registru CX
 	mov bx,[cs:tabulka_pozic+bx]    ; nacteni pozice vykreslovaneho retezce do registru BX
 	int 0x22                        ; vykresleni retezce (cislo sluzby 1 je nastaveno pred cyklem)
 	add dx,2                        ; pricteni 2 bajtu (cteme 16ti bitove adresy)
 	jmp menu_smycka                 ; a vykresleni dalsi polozky
+menu_smycka_konec_prekresleni:
+	jmp prekresli
 menu_smycka_konec:
 	mov ax,0x03                     ; kod sluzby 3 graficke knihovny, zobrazeni hodin
 	int 0x22                        ; a provedeni zobrazeni hodin
@@ -135,9 +137,9 @@ enter:
 pocet_menu_1:
 	db 3                     ; pocet polozek v menu
 pozice:
-	db 3                     ; aktualni pozice v menu
+	db 0                     ; aktualni pozice v menu
 predchozi_pozice:
-	db 0                     ; predchozi pozice v menu (musi se prekreslovat)
+	db 1                     ; predchozi pozice v menu (musi se prekreslovat)
 tabulka_retezcu:
 	dw retezec_prohlizec     ; adresa retezce prohlizece
 	dw retezec_editor        ; adresa retezce editoru
