@@ -121,7 +121,7 @@ vymaz_textovy_buffer:
 	xor ax, ax                                   ; vymazu ax registr
 	.vymazani:
 		mov bx,cx                            ; presunu hodnotu z cx do bx
-		mov byte [cs:textovy_buffer+bx],0    ; na vypoctenou adresu zapisu 0
+		mov byte [cs:textovy_buffer+bx-1],0  ; na vypoctenou adresu zapisu 0
 		loop .vymazani                       ; skacu na .loop, dokud v cx neni 0
 
 	popa                                         ; obnovim vsechny registry
