@@ -14,7 +14,7 @@
 %define segment_info 0x5800
 %define velikost_info 1
 %define segment_menu 0x6000
-%define velikost_menu 2
+%define velikost_menu 1
 
 ;nemenit nasledujici definice:
 %define start_jadro 2

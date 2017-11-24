@@ -52,7 +52,7 @@ nacteni_sektoru:
 	mov ax,menu               ; informace o sektorech menu
 	mov bx,segment_menu       ; informace o segmentu menu
 	call nacti_segmenty       ; nacteni sektoru do pameti
-	;jc restart                ; a pokud se to nezdari, restartuj system
+	jc restart                ; a pokud se to nezdari, restartuj system
 	; konec cteni sektoru
 	jmp skok_jadro            ; skok do nacteneho jadra
 restart:
