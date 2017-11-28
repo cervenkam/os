@@ -5,7 +5,7 @@ run: ../compiled/main.bin
 	# spusteni programu v qemu
 	qemu-system-x86_64 -drive file=../compiled/main.bin,format=raw -drive file=../compiled/drive.bin,cache=none,format=raw # -rtc base='2017-11-23T20:00:00'
 # vytvoreni binarniho obrazu OS
-main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin menu.bin
+../compiled/main.bin: loader.bin kernel.bin info.bin filesystem.bin editor.bin browser.bin 15.bin images.bin menu.bin
 	# k tomu pouzijeme "linker" - proste vlozime dane soubory za sebe
 	cat $^ > ../compiled/$@
 # kompilace jadra FailOSu
@@ -35,7 +35,7 @@ browser.bin: $(wildcard browser/*.asm)
 # kompilace graficke knihovny FailOSu
 images.bin: $(wildcard images/*.asm)
 	# preklad graficke knihovny assemblerem "nasm"
-	nasm -f bin images/images.asm -o $@
+	nasm -dSTYLES=freedoom -f bin images/images.asm -o $@
 # kompilace informativni obrazovky FailOSu
 info.bin: $(wildcard info/*.asm)
 	# preklad info obrazovky assemblerem "nasm"

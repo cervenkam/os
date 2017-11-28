@@ -103,49 +103,49 @@ pismo_male:
 	db 6                      ; vyska znaku
 	db 5                      ; sirka obrazku
 	db 0x34                   ; transparentni barva
-	dw ascii_small            ; adresa obrazku
-	dw ascii_small_pozice     ; pozice pismen v obrazku
-	dw ascii_small_sirka      ; sirka pismen v obrazku
+	dw mensi                  ; adresa obrazku
+	dw mensi_pozice           ; pozice pismen v obrazku
+	dw mensi_sirka            ; sirka pismen v obrazku
 	db 0                      ; pridani konstantni barvy
-pismo_doom:
+pismo_vetsi:
 	db 12                     ; vyska znaku
 	db 16                     ; sirka obrazku
 	db 0x34                   ; transparentni barva
-	dw doom                   ; adresa obrazku
-	dw doom_pozice            ; pozice pismen v obrazku
-	dw doom_sirka             ; sirka pismen v obrazku
+	dw vetsi                  ; adresa obrazku
+	dw vetsi_pozice           ; pozice pismen v obrazku
+	dw vetsi_sirka            ; sirka pismen v obrazku
 	db 0                      ; pridani konstantni barvy
-pismo_doom_svetlejsi:
+pismo_vetsi_svetlejsi:
 	db 12                     ; vyska znaku
 	db 16                     ; sirka obrazku
 	db 0x34                   ; transparentni barva
-	dw doom                   ; adresa obrazku
-	dw doom_pozice            ; pozice pismen v obrazku
-	dw doom_sirka             ; sirka pismen v obrazku
+	dw vetsi                  ; adresa obrazku
+	dw vetsi_pozice           ; pozice pismen v obrazku
+	dw vetsi_sirka            ; sirka pismen v obrazku
 	db 41                     ; pridani konstantni barvy
-pismo_doomfaces:
+pismo_obliceje:
 	db 31                     ; vyska znaku
 	db 24                     ; sirka obrazku
 	db 11                     ; transparentni barva
-	dw doomfaces_font         ; adresa obrazku
-	dw doomfaces_pozice       ; pozice pismen v obrazku
-	dw doomfaces_sirka        ; sirka pismen v obrazku
+	dw obliceje_font          ; adresa obrazku
+	dw obliceje_pozice        ; pozice pismen v obrazku
+	dw obliceje_sirka         ; sirka pismen v obrazku
 	db 0                      ; pridani konstantni barvy
 pismo_male_pruhledne:
 	db 6                      ; vyska znaku
 	db 5                      ; sirka obrazku
 	db 0                      ; transparentni barva
-	dw ascii_small            ; adresa obrazku
-	dw ascii_small_pozice     ; pozice pismen v obrazku
-	dw ascii_small_sirka      ; sirka pismen v obrazku
+	dw mensi                  ; adresa obrazku
+	dw mensi_pozice           ; pozice pismen v obrazku
+	dw mensi_sirka            ; sirka pismen v obrazku
 	db 0                      ; pridani konstantni barvy
 pismo_male_jina_barva:
 	db 6                      ; vyska znaku
 	db 5                      ; sirka obrazku
 	db 0                      ; transparentni barva
-	dw ascii_small            ; adresa obrazku
-	dw ascii_small_pozice     ; pozice pismen v obrazku
-	dw ascii_small_sirka      ; sirka pismen v obrazku
+	dw mensi                  ; adresa obrazku
+	dw mensi_pozice           ; pozice pismen v obrazku
+	dw mensi_sirka            ; sirka pismen v obrazku
 	db 3                      ; pridani konstantni barvy
 
 ; vykresli text na obrazovku ve video modu
@@ -246,11 +246,17 @@ text_zobraz_znak:
 	text_konec_vnejsi_cyklus:
 	popa                                         ; obnovime stav vsech registru
 	ret                                          ; a provedeme navrat z podprogramu
-%include "images/doomfaces_font.asm"
-%include "images/ascii_small.asm"
-%include "images/doom.asm"
+
+%macro incdef 2
+%defstr soubor images/%1/%2
+%include soubor
+%endmacro
+
+incdef STYLES,font_faces.asm
+incdef STYLES,font_small.asm
+incdef STYLES,font_big.asm
 	
-doom_pozice:
+vetsi_pozice:
 	times 48 db 0                                                          ; na prvnich 48 ASCII pozicich neni zadny znak
 	db 26,27,28,29,30,31,32,33,34,35                                       ; pozice cislic v obrazku "0-9"
 	times 7 db 0                                                           ; na techto pozicich neni zadny znak
@@ -258,7 +264,7 @@ doom_pozice:
 	times 6 db 0                                                           ; na techto pozicich neni zadny znak
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku "a-z"
 	times 5 db 0                                                           ; na techto pozicich neni zadny znak
-ascii_small_pozice:
+mensi_pozice:
 	db 0                                                                   ; zde neni zadny znak
 	db 39                                                                  ; pozice plneho znaku (kurzoru pro editor) "#"
 	times 30 db 0                                                          ; na techto pozicich neni zadny znak
@@ -273,7 +279,7 @@ ascii_small_pozice:
 	times 6 db 0                                                           ; na techto pozicich neni zadny znak
 	db 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25 ; pozice znaku "a-z"
 	times 5 db 0
-doom_sirka:
+vetsi_sirka:
 	times 48 db 0                                                                    ; na prvnich 48 ASCII pozicich neni zadny znak
 	db 11,7,11,11,11,11,11,11,11,11                                                  ; sirka cislic v obrazku "0-9"
 	times 7 db 0                                                                     ; na techto pozicich neni zadny znak
@@ -281,7 +287,7 @@ doom_sirka:
 	times 6 db 0                                                                     ; na techto pozicich neni zadny znak
 	db 14,14,14,14,14,12,16,15,6,11,16,11,16,16,16,14,16,15,15,12,16,16,16,14,16,16  ; sirka znaku "a-z"
 	times 5 db 0                                                                     ; na techto pozicich neni zadny znak
-ascii_small_sirka:
+mensi_sirka:
 	db 0                                                   ; na teto pozici neni zadny znak
 	db 5                                                   ; sirka plneho znaku (kurzoru pro editor) "#"
 	times 30 db 0                                          ; na techto pozicich neni zadny znak
@@ -296,11 +302,11 @@ ascii_small_sirka:
 	times 6 db 0                                           ; na techto pozicich nejsou zadne znaky
 	db 5,5,5,5,5,5,5,5,1,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5 ; sirka znaku "a-z"
 	times 5 db 0                                           ; na techto pozicich nejsou zadne znaky
-doomfaces_sirka:
+obliceje_sirka:
 	dw 0             ; na prvnich dvou pozicich nejsou zadne znaky
 	times 6 db 24    ; dalsich 6 znaku ma sirku 24 (6 obliceju)
 	times 250 db 0   ; ostatni znaky nemaji sirku
-doomfaces_pozice:
+obliceje_pozice:
 	dw 0             ; na prvnich dvou pozicich nejsou zadne znaky
 	db 0,1,2,3,4,5   ; dalsich 6 znaku jsou obliceje od 0 do 5ti vcetne
 	times 250 db 0   ; ostatni znaky neexistuji
