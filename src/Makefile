@@ -35,7 +35,7 @@ browser.bin: $(wildcard browser/*.asm)
 # kompilace graficke knihovny FailOSu
 images.bin: $(wildcard images/*.asm)
 	# preklad graficke knihovny assemblerem "nasm"
-	nasm -dSTYLES=wolf -f bin images/images.asm -o $@
+	nasm -dSTYLES=keen -f bin images/images.asm -o $@
 # kompilace informativni obrazovky FailOSu
 info.bin: $(wildcard info/*.asm)
 	# preklad info obrazovky assemblerem "nasm"
